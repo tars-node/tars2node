@@ -15,23 +15,22 @@ tars2node [OPTIONS] tarsfile
 ## 选项
 
 > Options:
-
->  --version                    print tars2node version
->  --rpc-path=[DIRECTORY]       specify the path of rpc module.
->  --stream-path=[DIRECTORY[]   specify the path of stream module.
->  --allow-reserved-namespace   allow you to use reserved word as a namespace.
->  --dir=DIRECTORY              generate source file to DIRECTORY.
->  --relative                   use current path.
->  --tarsBase=DIRECTORY          where to search tars files.
->  --r                          generate source all tars files.
->  --r-minimal                  minimize the dependent members.
->  --r-reserved                 list of names(split by ",") that should be keeped.
->  --client                     just for client side source file.
->  --server                     just for server side source file.
->  --dts                        generate d.ts file.
->  --use-string-represent       use string represent long type.
->  --string-binary-encoding     get string raw bytes <BinBuffer>.
->  --optimize=[0|s]             support "s" to reduce code size, default is 0.
+>  --version                    print tars2node version.  
+>  --rpc-path=[DIRECTORY]       specify the path of rpc module.  
+>  --stream-path=[DIRECTORY[]   specify the path of stream module.  
+>  --allow-reserved-namespace   allow you to use reserved word as a namespace.  
+>  --dir=DIRECTORY              generate source file to DIRECTORY.  
+>  --relative                   use current path.  
+>  --tarsBase=DIRECTORY          where to search tars files.  
+>  --r                          generate source all tars files.  
+>  --r-minimal                  minimize the dependent members.  
+>  --r-reserved                 list of names(split by ",") that should be keeped.  
+>  --client                     just for client side source file.  
+>  --server                     just for server side source file.  
+>  --dts                        generate d.ts file.  
+>  --use-string-represent       use string represent long type.  
+>  --string-binary-encoding     get string raw bytes <BinBuffer>.  
+>  --optimize=[0|s]             support "s" to reduce code size, default is 0.  
 
 ## 从源码编译
 
