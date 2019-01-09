@@ -325,9 +325,10 @@ bool CodeGenerator::generateJSServer(const ContextPtr &pPtr)
     ostringstream estr;
     bool bNeedAssert = false;
     bool bNeedStream = false;
+    bool bQuickFunc = false;
     for(size_t i = 0; i < namespaces.size(); i++)
     {
-        estr << generateJS(namespaces[i], bNeedStream, bNeedAssert);
+        estr << generateJS(namespaces[i], bNeedStream, bNeedAssert, bQuickFunc);
     }
 
     bool bNeedRpc = false;
@@ -363,10 +364,15 @@ bool CodeGenerator::generateJSServer(const ContextPtr &pPtr)
 
         ostr << TAB << "var " << it->second.sModule << " = require(\"" << it->second.sFile << "\");" << endl;
     }
+    if (bQuickFunc)
+    {
+        ostr << endl;
+        ostr << TAB << "var _hasOwnProperty = Object.prototype.hasOwnProperty;" << endl;
+    }
 
     ostringstream str;
 
-    str << printHeaderRemark("Server");
+    str << printHeaderRemark("Server", DISABLE_ESLINT);
     str << "\"use strict\";" << endl << endl;
     str << ostr.str() << endl;
     str << istr.str();

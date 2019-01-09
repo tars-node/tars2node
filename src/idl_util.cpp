@@ -109,7 +109,7 @@ string CodeGenerator::getClassName(const TypePtr& pPtr)
     VectorPtr vPtr = VectorPtr::dynamicCast(pPtr);
     if (vPtr)
     {
-        return "list(" + getDataType(vPtr->getTypePtr()) + ")";
+        return "list(" + getClassName(vPtr->getTypePtr()) + ")";
     }
 
     StructPtr sPtr = StructPtr::dynamicCast(pPtr);
@@ -118,7 +118,7 @@ string CodeGenerator::getClassName(const TypePtr& pPtr)
         vector<string> vecNames = TC_Common::sepstr<string>(sPtr->getSid(), "::");
         assert(vecNames.size() == 2);
 
-        return findName(vecNames[0], vecNames[1]);
+        return vecNames[0] + "." + vecNames[1];
     }
 
     MapPtr mPtr = MapPtr::dynamicCast(pPtr);

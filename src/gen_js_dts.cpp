@@ -21,7 +21,7 @@ string CodeGenerator::generateDTS(const EnumPtr &pPtr, const string &sNamespace)
     ostringstream s;
 
     INC_TAB;
-    s << TAB << "enum " << pPtr->getId() << " {" << endl;
+    s << TAB << (_bEnumReverseMappings ? "enum " : "const enum ") << pPtr->getId() << " {" << endl;
 
     INC_TAB;
     //成员变量
@@ -83,9 +83,29 @@ string CodeGenerator::generateDTS(const StructPtr &pPtr, const string &sNamespac
 
     string sStructName = pPtr->getId() + "$OBJ";
     vector<TypeIdPtr> &member = pPtr->getAllMemberPtr();
-    ostringstream s;
-
     INC_TAB;
+
+    ostringstream istr;
+    bool bNever = false;
+    istr << TAB << "interface " << sStructName << " {" << endl;
+    INC_TAB;
+    for (size_t i = 0; i < member.size(); i++)
+    {
+        const string &sType = getDtsType(member[i]->getTypePtr(), false);
+        if (!sType.empty())
+        {
+            istr << TAB << (member[i]->getId()) << (member[i]->isRequire()?": ":"?: ") << sType << ";" << endl;
+        }
+        else
+        {
+            bNever = true;
+        }
+    }
+    DEL_TAB;
+    istr << TAB << "}" << endl;
+    
+
+    ostringstream s;
     s << TAB << "class " << pPtr->getId() << " {" << endl;
     INC_TAB;
     
@@ -105,8 +125,8 @@ string CodeGenerator::generateDTS(const StructPtr &pPtr, const string &sNamespac
      */ 
     if (_iOptimizeLevel != Os)
     {
-        s << TAB << "toObject(): " << sStructName << ";" << endl;
-        s << TAB << "readFromObject(json: " << sStructName << "): void;" << endl;
+        s << TAB << "toObject(): " << (bNever ? "never" : sStructName) << ";" << endl;
+        s << TAB << "readFromObject(json: " << sStructName << "): " << pPtr->getId() << ";" << endl;
         s << TAB << "toBinBuffer(): " << IDL_NAMESPACE_STR << "Stream.BinBuffer;" << endl;
         s << TAB << "static new(): " << pPtr->getId() << ";" << endl;
         s << TAB << "static create(is: " << IDL_NAMESPACE_STR << "Stream." << IDL_TYPE << "InputStream): " << pPtr->getId() << ";" << endl;
@@ -114,20 +134,10 @@ string CodeGenerator::generateDTS(const StructPtr &pPtr, const string &sNamespac
     DEL_TAB;
     s << TAB << "}" << endl;
 
-    s << TAB << "interface " << sStructName << " {" << endl;
-    INC_TAB;
-    
-    for (size_t i = 0; i < member.size(); i++)
-    {
-        const string &sType = getDtsType(member[i]->getTypePtr(), false);
-        if (!sType.empty())
-        {
-            s << TAB << (member[i]->getId()) << (member[i]->isRequire()?": ":"?: ") << sType << ";" << endl;
-        }
-    }
+    s << istr.str();
+
     DEL_TAB;
-    s << TAB << "}" << endl;
-    DEL_TAB;
+
     return s.str();
 }
 
@@ -187,7 +197,7 @@ string CodeGenerator::generateDTS(const NamespacePtr &pPtr, const string &sConte
     ostringstream str;
     if (!sContent.empty())
     {
-        str << "export declare namespace " << pPtr->getId() << " {" << endl;
+        str << "export namespace " << pPtr->getId() << " {" << endl;
         str << sContent;
         str << "}" << endl << endl;
     }
@@ -228,7 +238,7 @@ void CodeGenerator::generateDTS(const ContextPtr &pPtr)
 
     //生成文件内容    
     ostringstream sstr;
-    sstr << printHeaderRemark("Structure");
+    sstr << printHeaderRemark("Structure", DISABLE_TSLINT);
     sstr << ostr.str() << endl;
     sstr << estr.str() << endl;
 

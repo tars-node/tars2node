@@ -30,6 +30,7 @@ tars2node [OPTIONS] tarsfile
 | --dts                      | 生成时附加 TypeScript 描述文件（.d.ts）。|
 | --use-string-represent     | 当需要保持 <long> 类型的精度时，打开此选项使用 \<string\> 存储 \<long\>。|
 | --string-binary-encoding   | 遇到字符编码问题或需对原始数据进行存取时，打开此选项使用 \<buffer\> 存储 \<string\>。|
+| --enum-reverse-mappings    | 输出代码 \<enum\> 支持枚举值到枚举名的反向映射 。|
 | --optimize=[0\|s]          | 优化输出代码大小，默认为 0（也就是不优化）。|
 
 ## 例子

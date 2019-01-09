@@ -27,9 +27,16 @@ string CodeGenerator::printHeaderRemark(const string &sTypeName)
     s << "// **********************************************************************" << endl;
     s << endl;
 
-    s << "/* eslint-disable */" << endl;
+    return s.str();
+}
+
+string CodeGenerator::printHeaderRemark(const string &sTypeName, const string &sSuffix)
+{
+    ostringstream s;
+    s << printHeaderRemark(sTypeName);
+    s << sSuffix << endl;
     s << endl;
-    
+
     return s.str();
 }
 

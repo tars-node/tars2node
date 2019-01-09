@@ -60,6 +60,9 @@
 #define PROTOCOL_COMPLEX PROTOCOL_V(IDL_NAMESPACE_STR, PROTOCOL_NAME, "COMPLEX")
 #define PROTOCOL_VAR TO_LOWER_STRING(PROTOCOL_NAME)
 
+#define DISABLE_ESLINT "/* eslint-disable */"
+#define DISABLE_TSLINT "/* tslint:disable */"
+
 using namespace TC_NAMESPACE;
 
 class CodeGenerator
@@ -76,6 +79,7 @@ public:
           _bUseSpecialPath(false),
           _bUseStringRepresent(false),
           _bStringBinaryEncoding(false),
+          _bEnumReverseMappings(false),
           _bMinimalMembers(false),
           _bDTS(false),
           _iOptimizeLevel(O0) {}
@@ -99,6 +103,8 @@ public:
     void setUseStringRepresent(bool bEnable) { _bUseStringRepresent = bEnable; }
 
     void setStringBinaryEncoding(bool bEnable) { _bStringBinaryEncoding = bEnable; }
+
+    void setEnumReverseMappings(bool bEnable) { _bEnumReverseMappings = bEnable; }
 
     void setMinimalMembers(bool bEnable) { _bMinimalMembers = bEnable; }
 
@@ -153,13 +159,13 @@ private:
     string getDefault(const TypeIdPtr & pPtr, const string &sDefault, const string & sNamespace, const bool bGlobal);
 
 private:
-    string generateJS(const StructPtr & pPtr, const string &sNamespace, bool &bNeedAssert);
+    string generateJS(const StructPtr &pPtr, const string &sNamespace, bool &bNeedAssert, bool &bQuickFunc);
 
     string generateJS(const ConstPtr &pPtr, const string &sNamespace, bool &bNeedStream);
 
     string generateJS(const EnumPtr &pPtr, const string &sNamespace);
 
-    string generateJS(const NamespacePtr &pPtr, bool &bNeedStream, bool &bNeedAssert);
+    string generateJS(const NamespacePtr &pPtr, bool &bNeedStream, bool &bNeedAssert, bool &bQuickFunc);
 
     bool   generateJS(const ContextPtr &pPtr);
 
@@ -238,7 +244,9 @@ private:
 
     string getRealFileInfo(const string & sPath);
 
-    string printHeaderRemark(const string & sTypeName);
+    string printHeaderRemark(const string &sTypeName);
+
+    string printHeaderRemark(const string &sTypeName, const string &sSuffix);
 
 private:
     string _sRpcPath;
@@ -258,6 +266,8 @@ private:
     bool   _bUseStringRepresent;
 
     bool   _bStringBinaryEncoding;
+
+    bool   _bEnumReverseMappings;
 
     bool   _bMinimalMembers;
 

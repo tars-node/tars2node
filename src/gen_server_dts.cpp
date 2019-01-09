@@ -138,7 +138,7 @@ void CodeGenerator::generateDTSServer(const ContextPtr &pPtr)
     }
 
     ostringstream str;
-    str << printHeaderRemark("Server");
+    str << printHeaderRemark("Server", DISABLE_TSLINT);
     str << ostr.str() << endl;
     str << estr.str() << endl;
 

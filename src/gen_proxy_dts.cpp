@@ -189,7 +189,7 @@ void CodeGenerator::generateDTSProxy(const ContextPtr &cPtr)
 
     //生成文件内容
     ostringstream sstr;
-    sstr << printHeaderRemark("Client");
+    sstr << printHeaderRemark("Client", DISABLE_TSLINT);
     if (bNeedStream)
     {
         sstr << "import * as " << IDL_NAMESPACE_STR << "Stream from \"" << _sStreamPath << "\";" << endl;

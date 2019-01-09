@@ -199,22 +199,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
     DEL_TAB;
     str << TAB << "} catch (e) {" << endl;
     INC_TAB;
-    str << TAB << "throw {" << endl;
-    INC_TAB;
-    str << TAB << "\"request\" : data.request," << endl;
-    str << TAB << "\"response\" : {" << endl;
-    INC_TAB;
-    str << TAB << "\"costtime\" : data.request.costtime," << endl;
-    str << TAB << "\"error\" : {" << endl;
-    INC_TAB;
-    str << TAB << "\"code\" : " << IDL_NAMESPACE_STR << "Error.CLIENT.DECODE_ERROR," << endl;
-    str << TAB << "\"message\" : e.message" << endl;
-    DEL_TAB;
-    str << TAB << "}" << endl;
-    DEL_TAB;
-    str << TAB << "}" << endl;
-    DEL_TAB;
-    str << TAB << "};" << endl;
+    str << TAB << "throw _makeError(data, e.message, " << IDL_NAMESPACE_STR << "Error.CLIENT.DECODE_ERROR);" << endl;
     DEL_TAB;
     str << TAB << "}" << endl;
     DEL_TAB;
@@ -322,22 +307,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
     DEL_TAB;
     str << TAB << "} catch (e) {" << endl;
     INC_TAB;
-    str << TAB << "throw {" << endl;
-    INC_TAB;
-    str << TAB << "\"request\" : data.request," << endl;
-    str << TAB << "\"response\" : {" << endl;
-    INC_TAB;
-    str << TAB << "\"costtime\" : data.request.costtime," << endl;
-    str << TAB << "\"error\" : {" << endl;
-    INC_TAB;
-    str << TAB << "\"code\" : " << IDL_NAMESPACE_STR << "Error.CLIENT.DECODE_ERROR," << endl;
-    str << TAB << "\"message\" : e.message" << endl;
-    DEL_TAB;
-    str << TAB << "}" << endl;
-    DEL_TAB;
-    str << TAB << "}" << endl;
-    DEL_TAB;
-    str << TAB << "};" << endl;
+    str << TAB << "throw _makeError(data, e.message, " << IDL_NAMESPACE_STR << "Error.CLIENT.DECODE_ERROR);" << endl;
     DEL_TAB;
     str << TAB << "}" << endl;
     DEL_TAB;
@@ -347,17 +317,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
     //STEP03 生成框架调用错误处理函数（Error Response = ER）
     str << TAB << "var __" << nPtr->getId() << "_" << pPtr->getId() << "$" << oPtr->getId() << "$ER = function (data) {" << endl;
     INC_TAB;
-    str << TAB << "throw {" << endl;
-    INC_TAB;
-    str << TAB << "\"request\" : data.request," << endl;
-    str << TAB << "\"response\" : {" << endl;
-    INC_TAB;
-    str << TAB << "\"costtime\" : data.request.costtime," << endl;
-    str << TAB << "\"error\" : data.error" << endl;
-    DEL_TAB;
-    str << TAB << "}" << endl;
-    DEL_TAB;
-    str << TAB << "}" << endl;
+    str << TAB << "throw _makeError(data, \"Call " << pPtr->getId() << "::" << oPtr->getId() << " failed\");" << endl;
     DEL_TAB;
     str << TAB << "};" << endl << endl;
 
@@ -481,7 +441,7 @@ bool CodeGenerator::generateJSProxy(const ContextPtr &cPtr)
             INC_TAB;
             istr << TAB << "return this._worker.version;" << endl;
             DEL_TAB;
-            istr << TAB << "};" << endl << endl;
+            istr << TAB << "};" << endl;
         }
     }
 
@@ -489,9 +449,10 @@ bool CodeGenerator::generateJSProxy(const ContextPtr &cPtr)
     ostringstream estr;
     bool bNeedAssert = false;
     bool bNeedStream = false;
+    bool bQuickFunc = false;
 	for(size_t i = 0; i < namespaces.size(); i++)
 	{
-		estr << generateJS(namespaces[i], bNeedStream, bNeedAssert);
+		estr << generateJS(namespaces[i], bNeedStream, bNeedAssert, bQuickFunc);
 	}
 
     bool bNeedRpc = false;
@@ -518,7 +479,7 @@ bool CodeGenerator::generateJSProxy(const ContextPtr &cPtr)
 
     //生成文件内容    
     ostringstream sstr;
-    sstr << printHeaderRemark("Client");
+    sstr << printHeaderRemark("Client", DISABLE_ESLINT);
     sstr << "\"use strict\";" << endl << endl;
     if (bNeedAssert)
     {
@@ -534,6 +495,48 @@ bool CodeGenerator::generateJSProxy(const ContextPtr &cPtr)
     }
 
     sstr << ostr.str() << endl;
+
+    //生成帮助函数
+    if (bQuickFunc)
+    {
+        sstr << "var _hasOwnProperty = Object.prototype.hasOwnProperty;" << endl;
+    }
+    if (bNeedRpc)
+    {
+        sstr << TAB << "var _makeError = function (data, message, type) {" << endl;
+        INC_TAB;
+        sstr << TAB << "var error = new Error(message || \"\");" << endl;
+        sstr << TAB << "error.request = data.request;" << endl;
+        sstr << TAB << "error.response = {" << endl;
+        INC_TAB;
+        sstr << TAB << "\"costtime\" : data.request.costtime" << endl;
+        DEL_TAB;
+        sstr << TAB << "};" << endl;
+        sstr << TAB << "if (type === " << IDL_NAMESPACE_STR << "Error.CLIENT.DECODE_ERROR) {" << endl;
+        INC_TAB;
+        sstr << TAB << "error.name = \"DECODE_ERROR\";" << endl;
+        sstr << TAB << "error.response.error = {" << endl;
+        INC_TAB;
+        sstr << TAB << "\"code\" : type," << endl;
+        sstr << TAB << "\"message\" : message" << endl;
+        DEL_TAB;
+        sstr << TAB << "};" << endl;
+        DEL_TAB;
+        sstr << TAB << "} else {" << endl;
+        INC_TAB;
+        sstr << TAB << "error.name = \"RPC_ERROR\";" << endl;
+        sstr << TAB << "error.response.error = data.error;" << endl;
+        DEL_TAB;
+        sstr << TAB << "}" << endl;
+        sstr << TAB << "return error;" << endl;
+        DEL_TAB;
+        sstr << TAB << "};" << endl;
+    }
+    if (bQuickFunc || bNeedRpc)
+    {
+        sstr << endl;
+    }
+
     sstr << istr.str() << endl;
     sstr << estr.str() << endl;
 
