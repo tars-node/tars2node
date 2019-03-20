@@ -27,6 +27,7 @@ tars2node [OPTIONS] tarsfile
 | --r-reserved               | 精简依赖文件时需保留的成员。|
 | --client                   | 生成客户端的调用类代码。|
 | --server                   | 生成服务端的框架代码。|
+| --ts                       | 打开此选项将后将只生成 TypeScript (.ts) 代码。|
 | --dts                      | 生成时附加 TypeScript 描述文件（.d.ts）。|
 | --use-string-represent     | 当需要保持 <long> 类型的精度时，打开此选项使用 \<string\> 存储 \<long\>。|
 | --string-binary-encoding   | 遇到字符编码问题或需对原始数据进行存取时，打开此选项使用 \<buffer\> 存储 \<string\>。|

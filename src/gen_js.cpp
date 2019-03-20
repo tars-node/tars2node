@@ -73,7 +73,6 @@ string CodeGenerator::generateJS(const EnumPtr &pPtr, const string &sNamespace)
         s << TAB << "};" << endl;
     }
 
-    //函数
     s << TAB << sNamespace << "." << pPtr->getId() << "._classname = \"" << sNamespace << "." << pPtr->getId() << "\";" << endl;
     s << TAB << sNamespace << "." << pPtr->getId() << "._write = function(os, tag, val) { return os.writeInt32(tag, val); };" << endl;
     s << TAB << sNamespace << "." << pPtr->getId() << "._read  = function(is, tag, def) { return is.readInt32(tag, true, def); };" << endl;
@@ -390,7 +389,7 @@ bool CodeGenerator::generateJS(const ContextPtr &pPtr)
         }
     }
 
-    //先生成编解码体
+    // generate encoders and decoders
     ostringstream estr;
     bool bNeedAssert = false;
     bool bNeedStream = false;
@@ -404,7 +403,7 @@ bool CodeGenerator::generateJS(const ContextPtr &pPtr)
         return false;
     }
 
-    //再生成导入模块
+    // generate module imports
     ostringstream ostr;
     for (map<string, ImportFile>::iterator it = _mapFiles.begin(); it != _mapFiles.end(); it++)
     {
@@ -415,7 +414,7 @@ bool CodeGenerator::generateJS(const ContextPtr &pPtr)
         ostr << "var " << it->second.sModule << " = require(\"" << it->second.sFile << "\");" << endl;
     }
 
-    //生成文件内容
+    // concat generated code
     ostringstream sstr;
     sstr << printHeaderRemark("Structure", DISABLE_ESLINT);
     sstr << "\"use strict\";" << endl << endl;

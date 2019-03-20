@@ -38,6 +38,7 @@ void usage()
     cout << "  --r-reserved                 list of names(split by \",\") that should be keeped." << endl;
     cout << "  --client                     just for client side source file." << endl;
     cout << "  --server                     just for server side source file." << endl;
+    cout << "  --ts                         generate typescript file." << endl;
     cout << "  --dts                        generate d.ts file." << endl;
     cout << "  --use-string-represent       use <string> represent <long> type." << endl;
     cout << "  --string-binary-encoding     get string raw bytes <BinBuffer>." << endl;
@@ -119,7 +120,7 @@ int main(int argc, char* argv[])
     #undef ALLOW_USE_RESERVED_NAMESPACE
     #undef ALLOW_USE_RESERVED_NAMESPACE_BASE
     #undef ALLOW_USE_RESERVED_NAMESPACE_V
-        
+
         g_parse->setUseCurrentPath(option.hasParam("relative"));
 
         CodeGenerator generator;
@@ -132,8 +133,9 @@ int main(int argc, char* argv[])
         generator.setUseStringRepresent(option.hasParam("use-string-represent"));
         generator.setStringBinaryEncoding(option.hasParam("string-binary-encoding"));
         generator.setEnumReverseMappings(option.hasParam("enum-reverse-mappings"));
+        generator.setEnableTS(option.hasParam("ts"));
         generator.setEnableDTS(option.hasParam("dts"));
-        
+
         if (option.hasParam("optimize"))
         {
             string level = TC_Common::lower(option.getValue("optimize"));

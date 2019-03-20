@@ -51,7 +51,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
         sParams += (sParams.empty()?"":", ") + vParamDecl[i]->getTypeIdPtr()->getId();
     }
 
-    //SETP01 生成函数声明（Interface = IF）
+    // generate function metadata (SharedFunctionInfo)
     str << TAB << "var __" << nPtr->getId() << "_" << pPtr->getId() << "$" << oPtr->getId() << "$IF = {" << endl;
 
     INC_TAB;
@@ -88,7 +88,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
 
     str << TAB << "};" << endl << endl;
 
-    //SETP02 生成 IDL 编码接口（IDL Encoder = IE）
+    // generate IDL Encoder ($IE)
     str << TAB << "var __" << nPtr->getId() << "_" << pPtr->getId() << "$" << oPtr->getId() << "$IE = function (" << sParams << ") {" << endl;
     
     INC_TAB;
@@ -103,7 +103,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
             << (i + 1) << ", " << vParamDecl[i]->getTypeIdPtr()->getId() 
             << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "") << ");" << endl;
 
-        // 写入 Dependent 列表
+        // push the symbol into dependent list
         getDataType(vParamDecl[i]->getTypeIdPtr()->getTypePtr());
     }
 
@@ -113,7 +113,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
 
     str << TAB << "};" << endl << endl;
 
-    //STEP03 生成 IDL 解码函数（IDL Decoder = ID）
+    // generate IDL Decoder ($ID)
     str << TAB << "var __" << nPtr->getId() << "_" << pPtr->getId() << "$" << oPtr->getId() << "$ID = function (data) {" << endl;
     INC_TAB;
     str << TAB << "try {" << endl;
@@ -205,7 +205,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
     DEL_TAB;
     str << TAB << "};" << endl << endl;
 
-    //SETP04 生成 Protocol 编码接口（Protocol Encoder = PE）
+    // generate Protocol Encoder ($PE)
     str << TAB << "var __" << nPtr->getId() << "_" << pPtr->getId() << "$" << oPtr->getId() << "$PE = function (" 
         << sParams << (sParams.empty() ? "" : ", ") << "__$PROTOCOL$VERSION) {" << endl;
     
@@ -223,7 +223,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
             << vParamDecl[i]->getTypeIdPtr()->getId() << "\", " << vParamDecl[i]->getTypeIdPtr()->getId() 
             << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "") << ");" << endl;
 
-        // 写入 Dependent 列表
+        // push the symbol into dependent list
         getDataType(vParamDecl[i]->getTypeIdPtr()->getTypePtr());
     }
 
@@ -231,7 +231,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
     DEL_TAB;
     str << TAB << "};" << endl << endl;
 
-    // STEP05 生成 Protocol 解码函数（Protocol Decoder = PD）
+    // generate Protocol Decoder ($PD)
     str << TAB << "var __" << nPtr->getId() << "_" << pPtr->getId() << "$" << oPtr->getId() << "$PD = function (data) {" << endl;
     INC_TAB;
     str << TAB << "try {" << endl;
@@ -314,7 +314,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
     str << TAB << "};" << endl << endl;
 
 
-    //STEP03 生成框架调用错误处理函数（Error Response = ER）
+    // generate error handler ($ER）
     str << TAB << "var __" << nPtr->getId() << "_" << pPtr->getId() << "$" << oPtr->getId() << "$ER = function (data) {" << endl;
     INC_TAB;
     str << TAB << "throw _makeError(data, \"Call " << pPtr->getId() << "::" << oPtr->getId() << " failed\");" << endl;
@@ -322,7 +322,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
     str << TAB << "};" << endl << endl;
 
 
-    //SETP04 生成函数接口
+    // generate function body
     str << TAB << nPtr->getId() << "." << pPtr->getId() << "Proxy.prototype." << oPtr->getId() << " = function ("
         << sParams << ") {" << endl;
 
@@ -344,7 +344,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
 
     str << TAB << "};" << endl;
 
-    //SETP05 绑定函数声明
+    // add the function into the prototype of the proxy class
     str << TAB << nPtr->getId() << "." << pPtr->getId() << "Proxy." << oPtr->getId() << " = "
             << "__" << nPtr->getId() << "_" << pPtr->getId() << "$" << oPtr->getId() << "$IF;" << endl;
 
@@ -445,7 +445,7 @@ bool CodeGenerator::generateJSProxy(const ContextPtr &cPtr)
         }
     }
 
-    //先生成编解码 + 代理类
+    // generate proxy classes with encoders and decoders
     ostringstream estr;
     bool bNeedAssert = false;
     bool bNeedStream = false;
@@ -466,7 +466,7 @@ bool CodeGenerator::generateJSProxy(const ContextPtr &cPtr)
         return false;
     }
 
-    //再生成导入模块
+    // generate module imports
     ostringstream ostr;
     for (map<string, ImportFile>::iterator it = _mapFiles.begin(); it != _mapFiles.end(); it++)
     {
@@ -477,7 +477,7 @@ bool CodeGenerator::generateJSProxy(const ContextPtr &cPtr)
         ostr << "var " << it->second.sModule << " = require(\"" << it->second.sFile << "\");" << endl;
     }
 
-    //生成文件内容    
+    // concat generated code    
     ostringstream sstr;
     sstr << printHeaderRemark("Client", DISABLE_ESLINT);
     sstr << "\"use strict\";" << endl << endl;
@@ -496,7 +496,7 @@ bool CodeGenerator::generateJSProxy(const ContextPtr &cPtr)
 
     sstr << ostr.str() << endl;
 
-    //生成帮助函数
+    // generate helper functions
     if (bQuickFunc)
     {
         sstr << "var _hasOwnProperty = Object.prototype.hasOwnProperty;" << endl;

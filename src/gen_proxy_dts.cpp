@@ -16,35 +16,6 @@
 
 #include "code_generator.h"
 
-string CodeGenerator::generateDTSProxyInfo()
-{
-    ostringstream str;
-
-    INC_TAB;
-
-    // Argument
-    str << TAB << "interface SharedArgumentInfo {" << endl;
-    INC_TAB;
-    str << TAB << "name: string;" << endl;
-    str << TAB << "class: string;" << endl;
-    str << TAB << "direction: 'in' | 'out';" << endl;
-    DEL_TAB;
-    str << TAB << "}" << endl;
-
-    // Function
-    str << TAB << "interface SharedFunctionInfo {" << endl;
-    INC_TAB;
-    str << TAB << "name: string;" << endl;
-    str << TAB << "return: string;" << endl;
-    str << TAB << "arguments: SharedArgumentInfo[];" << endl;
-    DEL_TAB;
-    str << TAB << "}" << endl;
-
-    DEL_TAB;
-
-    return str.str();
-}
-
 string CodeGenerator::generateDTSProxy(const InterfacePtr &pPtr)
 {
     vector<OperationPtr> &vOperation = pPtr->getAllOperationPtr();
@@ -62,75 +33,47 @@ string CodeGenerator::generateDTSProxy(const InterfacePtr &pPtr)
     {
         OperationPtr &oPtr = vOperation[i];
 
+        string funcReturnGeneric = "<";
+        if (oPtr->getReturnPtr()->getTypePtr())
+        {
+            funcReturnGeneric += getTsType(oPtr->getReturnPtr()->getTypePtr()) + ", ";
+        }
+        else
+        {
+            funcReturnGeneric += "undefined, ";
+        }
+
         str << TAB << oPtr->getId() << "(";
 
+        string argType = "";
         vector<ParamDeclPtr> &vParamDecl = oPtr->getAllParamDeclPtr();
-        for (size_t j = 0; j < vParamDecl.size(); j++) 
+        for (size_t j = 0; j < vParamDecl.size(); j++)
         {
-            if(vParamDecl[j]->isOut()) 
+            if(vParamDecl[j]->isOut())
             {
+                argType += (argType.empty() ? "" : ", ") + vParamDecl[j]->getTypeIdPtr()->getId() + ": " + getTsType(vParamDecl[j]->getTypeIdPtr()->getTypePtr());
                 continue;
             }
-            str << vParamDecl[j]->getTypeIdPtr()->getId() << ": " << getDtsType(vParamDecl[j]->getTypeIdPtr()->getTypePtr());
+            str << vParamDecl[j]->getTypeIdPtr()->getId() << ": " << getTsType(vParamDecl[j]->getTypeIdPtr()->getTypePtr());
             str << ", ";
         }
-        str << "property?: " << IDL_NAMESPACE_STR << "Rpc.InvokeProperty): Promise<" << pPtr->getId() << "$" << oPtr->getId() << "$DE>;" << endl;
 
-        str << TAB << "static " << oPtr->getId() << ": SharedFunctionInfo;" << endl;
+        if (!argType.empty())
+        {
+            funcReturnGeneric += "{ " + argType + " }>";
+        }
+        else
+        {
+            funcReturnGeneric += "undefined>";
+        }
+
+        str << "options?: " << IDL_NAMESPACE_STR << "Rpc.InvokeProperty): Promise<" << IDL_NAMESPACE_STR << "Rpc.ProxyResponse" << funcReturnGeneric << ">;" << endl;
+
+        str << TAB << "static " << oPtr->getId() << ": " << IDL_NAMESPACE_STR << "Rpc.SharedFunctionInfo" << ";" << endl;
     }
     DEL_TAB;
     str << TAB << "}" << endl;
 
-    //interface
-    for (size_t i = 0; i < vOperation.size(); i++)
-    {
-        OperationPtr &oPtr = vOperation[i];
-
-        str << TAB << "interface " << pPtr->getId() << "$" << oPtr->getId() << "$DE {" << endl;
-        INC_TAB;
-        str << TAB << "request: object;" << endl;
-        str << TAB << "response: {" << endl;
-        INC_TAB;
-        str << TAB << "costtime: number;" << endl;
-        if (oPtr->getReturnPtr()->getTypePtr())
-        {
-            str << TAB << "return: " << getDtsType(oPtr->getReturnPtr()->getTypePtr()) << ";" << endl;
-        }
-        else
-        {
-            str << TAB << "return: void;" << endl;
-        }
-
-        vector<ParamDeclPtr> &vParamDecl = oPtr->getAllParamDeclPtr();
-        bool hasArgs = false;
-        for (size_t j = 0; j < vParamDecl.size(); j++)
-        {
-            if(vParamDecl[j]->isOut()) {
-                hasArgs = true;
-                break;
-            }
-        }
-
-        if(hasArgs)
-        {
-            str << TAB << "arguments: {" << endl;
-            INC_TAB;
-            for (size_t j = 0; j < vParamDecl.size(); j++)
-            {
-                if(!vParamDecl[j]->isOut()) {
-                    continue;
-                }
-                str << TAB << vParamDecl[j]->getTypeIdPtr()->getId() << ": " << getDtsType(vParamDecl[j]->getTypeIdPtr()->getTypePtr()) << ";" << endl;
-            }
-            DEL_TAB;
-            str << TAB << "}" << endl;
-        }
-
-        DEL_TAB;
-        str << TAB << "}" << endl;
-        DEL_TAB;
-        str << TAB << "}" << endl;
-    }
     DEL_TAB;
 
     return str.str();
@@ -144,8 +87,6 @@ string CodeGenerator::generateDTSProxy(const NamespacePtr &nPtr, bool &bNeedStre
     {
         bNeedStream = true;
         bNeedRpc = true;
-
-        str << generateDTSProxyInfo() << endl;
     }
     for (size_t i = 0; i < is.size(); i++)
     {
@@ -158,7 +99,7 @@ void CodeGenerator::generateDTSProxy(const ContextPtr &cPtr)
 {
     vector<NamespacePtr> namespaces = cPtr->getNamespaces();
 
-    //先生成编解码 + 代理类
+    // generate proxy classes with encoders and decoders
     ostringstream estr;
     bool bNeedStream = false;
     bool bNeedRpc = false;
@@ -176,18 +117,18 @@ void CodeGenerator::generateDTSProxy(const ContextPtr &cPtr)
         return;
     }
 
-    //再生成导入模块
+    // generate module imports
     ostringstream ostr;
     for (map<string, ImportFile>::iterator it = _mapFiles.begin(); it != _mapFiles.end(); it++)
     {
         if (it->second.sModule.empty()) continue;
-        
+
         if (estr.str().find(it->second.sModule + ".") == string::npos) continue;
 
         ostr << "import * as " << it->second.sModule << " from \"" << TC_File::excludeFileExt(it->second.sFile) << "\";" << endl;
     }
 
-    //生成文件内容
+    // concat generated code
     ostringstream sstr;
     sstr << printHeaderRemark("Client", DISABLE_TSLINT);
     if (bNeedStream)

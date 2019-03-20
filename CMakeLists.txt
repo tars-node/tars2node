@@ -7,7 +7,7 @@ set(CMAKE_VERBOSE_MAKEFILE off)
 # version
 set(TARS_VERSION "1.1.0")
 set(PARSER_VERSION "${TARS_VERSION}")
-set(GENERATOR_VERSION "20190109")
+set(GENERATOR_VERSION "20190320")
 
 # namespace
 set(IDL_NAMESPACE Tars)
@@ -21,8 +21,8 @@ set(IDL_TYPE "Tars")
 set(PROTOCOL_NAME "Tup")
 
 # flag
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O2 -Wall -Wno-sign-compare -Wno-unused-result")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O2 -Wall -Wno-sign-compare -Wno-unused-result -static")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -Wall -static")
 
 # define
 add_definitions(-DTARS_VERSION="${TARS_VERSION}")
