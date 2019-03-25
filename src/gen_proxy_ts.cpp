@@ -136,7 +136,7 @@ string CodeGenerator::generateTSProxy(const NamespacePtr &nPtr, const InterfaceP
 
         if (isSimple(oPtr->getReturnPtr()->getTypePtr()))
         {
-            str << getDefault(oPtr->getReturnPtr(), oPtr->getReturnPtr()->def(), nPtr->getId())
+            str << getDefault(oPtr->getReturnPtr(), oPtr->getReturnPtr()->def(), nPtr->getId(), true, true)
                 << (isRawOrString(oPtr->getReturnPtr()->getTypePtr()) ? ", 1" : "");
         }
         else
@@ -166,7 +166,7 @@ string CodeGenerator::generateTSProxy(const NamespacePtr &nPtr, const InterfaceP
 
             if (isSimple(vParamDecl[i]->getTypeIdPtr()->getTypePtr()))
             {
-                str << getDefault(vParamDecl[i]->getTypeIdPtr(), vParamDecl[i]->getTypeIdPtr()->def(), nPtr->getId())
+                str << getDefault(vParamDecl[i]->getTypeIdPtr(), vParamDecl[i]->getTypeIdPtr()->def(), nPtr->getId(), true, true)
                     << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "");
             }
             else
@@ -257,7 +257,7 @@ string CodeGenerator::generateTSProxy(const NamespacePtr &nPtr, const InterfaceP
             str << ", " << getDataType(oPtr->getReturnPtr()->getTypePtr(), true);
         }
 
-        str << ", " << getDefault(oPtr->getReturnPtr(), "", nPtr->getId(), true)
+        str << ", " << getDefault(oPtr->getReturnPtr(), "", nPtr->getId(), true, true)
                 << (isRawOrString(oPtr->getReturnPtr()->getTypePtr()) ? ", 1" : "");
 
         str << ")," << endl;

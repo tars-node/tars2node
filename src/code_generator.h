@@ -157,9 +157,7 @@ private:
 
     string getTsType(const TypePtr &pPtr, const bool bStream = true, const bool bBase = false);
 
-    string getDefault(const TypeIdPtr & pPtr, const string &sDefault, const string & sNamespace);
-
-    string getDefault(const TypeIdPtr & pPtr, const string &sDefault, const string & sNamespace, const bool bGlobal);
+    string getDefault(const TypeIdPtr & pPtr, const string &sDefault, const string & sNamespace, const bool &bGlobal = true, const bool &bCastEnumAsAny = false);
 
 private:
     string generateJS(const StructPtr &pPtr, const string &sNamespace, bool &bNeedAssert, bool &bQuickFunc);

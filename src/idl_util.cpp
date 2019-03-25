@@ -323,12 +323,7 @@ bool CodeGenerator::isBinBuffer(const TypePtr & pPtr) const
     return false;
 }
 
-string CodeGenerator::getDefault(const TypeIdPtr & pPtr, const string &sDefault, const string& sNamespace)
-{
-    return getDefault(pPtr, sDefault, sNamespace, true);
-}
-
-string CodeGenerator::getDefault(const TypeIdPtr & pPtr, const string &sDefault, const string& sNamespace, const bool bGlobal)
+string CodeGenerator::getDefault(const TypeIdPtr & pPtr, const string &sDefault, const string& sNamespace, const bool &bGlobal, const bool &bCastEnumAsAny)
 {
     BuiltinPtr bPtr = BuiltinPtr::dynamicCast(pPtr->getTypePtr());
     if (bPtr)
@@ -438,7 +433,7 @@ string CodeGenerator::getDefault(const TypeIdPtr & pPtr, const string &sDefault,
 
     if (bGlobal)
     {
-        return "new " + getDataType(pPtr->getTypePtr(), true);
+        return "new " + getDataType(pPtr->getTypePtr(), bCastEnumAsAny);
     }
 
     return sDefault;

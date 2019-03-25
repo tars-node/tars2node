@@ -77,7 +77,7 @@ string CodeGenerator::generateTS(const ConstPtr &pPtr, const string &sNamespace,
     INC_TAB;
     s << TAB << "export const " <<  pPtr->getTypeIdPtr()->getId() << ": "
         << getTsType(pPtr->getTypeIdPtr()->getTypePtr()) << " = "
-        << getDefault(pPtr->getTypeIdPtr(), GET_CONST_GRAMMAR_PTR(pPtr)->v, sNamespace, false) << ";"
+        << getDefault(pPtr->getTypeIdPtr(), GET_CONST_GRAMMAR_PTR(pPtr)->v, sNamespace, false, true) << ";"
         << endl;
     DEL_TAB;
     return s.str();
@@ -104,7 +104,7 @@ string CodeGenerator::generateTS(const StructPtr &pPtr, const string &sNamespace
     {
         s << TAB << (member[i]->getId()) << ": "
             << getTsType(member[i]->getTypePtr()) << " = "
-            << getDefault(member[i], member[i]->def(), sNamespace) << ";" << endl;
+            << getDefault(member[i], member[i]->def(), sNamespace, true, true) << ";" << endl;
     }
     if (member.size() > 0)
     {
@@ -133,7 +133,7 @@ string CodeGenerator::generateTS(const StructPtr &pPtr, const string &sNamespace
 
         if (isSimple(member[i]->getTypePtr()))
         {
-            s << getDefault(member[i], member[i]->def(), sNamespace)
+            s << getDefault(member[i], member[i]->def(), sNamespace, true, true)
                 << (isRawOrString(member[i]->getTypePtr()) ? ", 1" : "");
         }
         else

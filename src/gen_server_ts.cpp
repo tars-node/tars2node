@@ -141,7 +141,7 @@ string CodeGenerator::generateTSServerDispatch(const NamespacePtr &nPtr, const I
 
         if (vParamDecl[i]->isOut())
         {
-            dstr << ", " << getDefault(vParamDecl[i]->getTypeIdPtr(), "", nPtr->getId(), true)
+            dstr << ", " << getDefault(vParamDecl[i]->getTypeIdPtr(), "", nPtr->getId(), true, true)
                     << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "");
         }
 
@@ -163,7 +163,7 @@ string CodeGenerator::generateTSServerDispatch(const NamespacePtr &nPtr, const I
 
         if (isSimple(vParamDecl[i]->getTypeIdPtr()->getTypePtr()))
         {
-            dstr << getDefault(vParamDecl[i]->getTypeIdPtr(), vParamDecl[i]->getTypeIdPtr()->def(), nPtr->getId())
+            dstr << getDefault(vParamDecl[i]->getTypeIdPtr(), vParamDecl[i]->getTypeIdPtr()->def(), nPtr->getId(), true, true)
                     << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "");
         }
         else
