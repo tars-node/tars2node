@@ -330,7 +330,7 @@ string CodeGenerator::generateTSProxy(const NamespacePtr &nPtr, const InterfaceP
     str << TAB << "})" << endl << endl;     // end of metadata
 
     // generate function body
-    str << TAB << oPtr->getId() << "(" << sParamsWithType << (sParamsWithType.empty() ? "" : ", ") << "options?: " << IDL_NAMESPACE_STR << ".InvokeProperty) {" << endl;
+    str << TAB << oPtr->getId() << "(" << sParamsWithType << (sParamsWithType.empty() ? "" : ", ") << "options?: " << IDL_NAMESPACE_STR << "Rpc.InvokeProperty) {" << endl;
     INC_TAB;
 
     string sFuncFullName = pPtr->getId() + "Proxy." + oPtr->getId();
