@@ -58,7 +58,7 @@ string CodeGenerator::generateTSServerAsync(const NamespacePtr &nPtr, const Inte
     if (oPtr->getReturnPtr()->getTypePtr())
     {
         str << TAB << PROTOCOL_VAR << "." << toFunctionName(oPtr->getReturnPtr(), "write") << "(\"\", _ret"
-            << (isRawOrString(oPtr->getReturnPtr()->getTypePtr()) ? ", 1" : "") << ");" << endl;
+            << representArgument(oPtr->getReturnPtr()->getTypePtr()) << ");" << endl;
     }
     for (size_t i = 0; i < vParamDecl.size(); i++)
     {
@@ -66,7 +66,7 @@ string CodeGenerator::generateTSServerAsync(const NamespacePtr &nPtr, const Inte
 
         str << TAB << PROTOCOL_VAR << "." << toFunctionName(vParamDecl[i]->getTypeIdPtr(), "write") << "(\""
             << vParamDecl[i]->getTypeIdPtr()->getId() << "\", " << vParamDecl[i]->getTypeIdPtr()->getId()
-            << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "") << ");" << endl;
+            << representArgument(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) << ");" << endl;
     }
     str << endl;
     str << TAB << "this.doResponse(" << PROTOCOL_VAR << ".encode());" << endl;
@@ -78,7 +78,7 @@ string CodeGenerator::generateTSServerAsync(const NamespacePtr &nPtr, const Inte
     if (oPtr->getReturnPtr()->getTypePtr())
     {
         str << TAB << "os." << toFunctionName(oPtr->getReturnPtr(), "write") << "(0, _ret"
-            << (isRawOrString(oPtr->getReturnPtr()->getTypePtr()) ? ", 1" : "") << ");" << endl;
+            << representArgument(oPtr->getReturnPtr()->getTypePtr()) << ");" << endl;
     }
     for (size_t i = 0; i < vParamDecl.size(); i++)
     {
@@ -86,7 +86,7 @@ string CodeGenerator::generateTSServerAsync(const NamespacePtr &nPtr, const Inte
 
         str << TAB << "os." << toFunctionName(vParamDecl[i]->getTypeIdPtr(), "write") << "("
             << (i + 1) << ", " << vParamDecl[i]->getTypeIdPtr()->getId()
-            << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "") << ");" << endl;
+            << representArgument(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) << ");" << endl;
     }
     str << endl;
     str << TAB << "this.doResponse(os.getBinBuffer());" << endl;
@@ -142,7 +142,7 @@ string CodeGenerator::generateTSServerDispatch(const NamespacePtr &nPtr, const I
         if (vParamDecl[i]->isOut())
         {
             dstr << ", " << getDefault(vParamDecl[i]->getTypeIdPtr(), "", nPtr->getId(), true, true)
-                    << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "");
+                    << representArgument(vParamDecl[i]->getTypeIdPtr()->getTypePtr());
         }
 
         dstr << ");" << endl;
@@ -164,7 +164,7 @@ string CodeGenerator::generateTSServerDispatch(const NamespacePtr &nPtr, const I
         if (isSimple(vParamDecl[i]->getTypeIdPtr()->getTypePtr()))
         {
             dstr << getDefault(vParamDecl[i]->getTypeIdPtr(), vParamDecl[i]->getTypeIdPtr()->def(), nPtr->getId(), true, true)
-                    << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "");
+                    << representArgument(vParamDecl[i]->getTypeIdPtr()->getTypePtr());
         }
         else
         {

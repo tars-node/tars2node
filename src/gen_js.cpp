@@ -148,7 +148,7 @@ string CodeGenerator::generateJS(const StructPtr &pPtr, const string &sNamespace
         if (isSimple(member[i]->getTypePtr()))
         {
             s << getDefault(member[i], member[i]->def(), sNamespace)
-                << (isRawOrString(member[i]->getTypePtr()) ? ", 1" : "");
+                << representArgument(member[i]->getTypePtr());
         }
         else
         {
@@ -170,7 +170,7 @@ string CodeGenerator::generateJS(const StructPtr &pPtr, const string &sNamespace
         string sFuncName = toFunctionName(member[i], "write");
 
        	s << TAB << "os." << sFuncName << "(" << member[i]->getTag() << ", this." << member[i]->getId()
-            << (isRawOrString(member[i]->getTypePtr()) ? ", 1" : "") << ");" << endl;
+            << representArgument(member[i]->getTypePtr()) << ");" << endl;
     }
     DEL_TAB;
     s << TAB << "};" << endl;

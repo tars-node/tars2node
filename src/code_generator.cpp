@@ -105,7 +105,7 @@ void CodeGenerator::createFile(const string &file, const bool bEntry)
                 node.setTargetPath(_sToPath);
                 node.setRecursive(_bRecursive);
                 node.setUseSpecialPath(_bUseSpecialPath);
-                node.setUseStringRepresent(_bUseStringRepresent);
+                node.setLongType(_iLongType);
                 node.setStringBinaryEncoding(_bStringBinaryEncoding);
                 node.setMinimalMembers(_bMinimalMembers);
                 node.setDependent(_depMembers);

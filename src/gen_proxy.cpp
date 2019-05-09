@@ -100,8 +100,8 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
         if (vParamDecl[i]->isOut()) continue;
 
         str << TAB << "os." << toFunctionName(vParamDecl[i]->getTypeIdPtr(), "write") << "(" 
-            << (i + 1) << ", " << vParamDecl[i]->getTypeIdPtr()->getId() 
-            << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "") << ");" << endl;
+            << (i + 1) << ", " << vParamDecl[i]->getTypeIdPtr()->getId()
+            << representArgument(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) << ");" << endl;
 
         // push the symbol into dependent list
         getDataType(vParamDecl[i]->getTypeIdPtr()->getTypePtr());
@@ -140,7 +140,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
         if (isSimple(oPtr->getReturnPtr()->getTypePtr()))
         {
             str << getDefault(oPtr->getReturnPtr(), oPtr->getReturnPtr()->def(), nPtr->getId())
-                << (isRawOrString(oPtr->getReturnPtr()->getTypePtr()) ? ", 1" : "");
+                << representArgument(oPtr->getReturnPtr()->getTypePtr());
         }
         else
         {
@@ -166,8 +166,8 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
 
             if (isSimple(vParamDecl[i]->getTypeIdPtr()->getTypePtr()))
             {
-                str << getDefault(vParamDecl[i]->getTypeIdPtr(), vParamDecl[i]->getTypeIdPtr()->def(), nPtr->getId()) 
-                    << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "");
+                str << getDefault(vParamDecl[i]->getTypeIdPtr(), vParamDecl[i]->getTypeIdPtr()->def(), nPtr->getId())
+                    << representArgument(vParamDecl[i]->getTypeIdPtr()->getTypePtr());
             }
             else
             {
@@ -220,8 +220,8 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
         if (vParamDecl[i]->isOut()) continue;
 
         str << TAB << PROTOCOL_VAR << "." << toFunctionName(vParamDecl[i]->getTypeIdPtr(), "write") << "(\"" 
-            << vParamDecl[i]->getTypeIdPtr()->getId() << "\", " << vParamDecl[i]->getTypeIdPtr()->getId() 
-            << (isRawOrString(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) ? ", 1" : "") << ");" << endl;
+            << vParamDecl[i]->getTypeIdPtr()->getId() << "\", " << vParamDecl[i]->getTypeIdPtr()->getId()
+            << representArgument(vParamDecl[i]->getTypeIdPtr()->getTypePtr()) << ");" << endl;
 
         // push the symbol into dependent list
         getDataType(vParamDecl[i]->getTypeIdPtr()->getTypePtr());
@@ -257,7 +257,7 @@ string CodeGenerator::generateJSProxy(const NamespacePtr &nPtr, const InterfaceP
         }
 
         str << ", " << getDefault(oPtr->getReturnPtr(), "", nPtr->getId(), true)
-                << (isRawOrString(oPtr->getReturnPtr()->getTypePtr()) ? ", 1" : "");
+                << representArgument(oPtr->getReturnPtr()->getTypePtr());
         
         str << ")";
     }

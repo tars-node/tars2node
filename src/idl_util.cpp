@@ -68,23 +68,25 @@ string CodeGenerator::toFunctionName(const TypeIdPtr& pPtr, const string& sActio
     return "";
 }
 
-bool CodeGenerator::isRawOrString(const TypePtr& pPtr) const
+string CodeGenerator::representArgument(const TypePtr& pPtr) const
 {
     BuiltinPtr bPtr = BuiltinPtr::dynamicCast(pPtr);
     if (bPtr)
     {
-        if (_bUseStringRepresent && bPtr->kind() == Builtin::KindLong)
+        if (bPtr->kind() == Builtin::KindLong && _iLongType != CodeGenerator::Number)
         {
-            return true;
+            stringstream str;
+            str << ", " << _iLongType;
+            return str.str();
         }
 
         if (_bStringBinaryEncoding && bPtr->kind() == Builtin::KindString)
         {
-            return true;
+            return ", 1";
         }
     }
 
-    return false;
+    return "";
 }
 
 string CodeGenerator::getClassName(const TypePtr& pPtr)
@@ -163,8 +165,7 @@ string CodeGenerator::getDataType(const TypePtr& pPtr, const bool &bCastEnumAsAn
         {
             return IDL_NAMESPACE_STR + "Stream.BinBuffer";
         }
-
-        return IDL_NAMESPACE_STR + "Stream.List(" + getDataType(vPtr->getTypePtr(), bCastEnumAsAny) + (isRawOrString(vPtr->getTypePtr()) ? ", 1" : "") + ")";
+        return IDL_NAMESPACE_STR + "Stream.List(" + getDataType(vPtr->getTypePtr(), bCastEnumAsAny) + representArgument(vPtr->getTypePtr()) + ")";
     }
 
     StructPtr sPtr = StructPtr::dynamicCast(pPtr);
@@ -179,20 +180,10 @@ string CodeGenerator::getDataType(const TypePtr& pPtr, const bool &bCastEnumAsAn
     MapPtr mPtr = MapPtr::dynamicCast(pPtr);
     if (mPtr)
     {
-        bool bLeft = isRawOrString(mPtr->getLeftTypePtr());
-        bool bRight = isRawOrString(mPtr->getRightTypePtr());
-
-        if (!bRight && !bLeft) {
-            return IDL_NAMESPACE_STR + "Stream.Map(" + getDataType(mPtr->getLeftTypePtr(), bCastEnumAsAny) + ", " + getDataType(mPtr->getRightTypePtr(), bCastEnumAsAny) + ")";
-        } else if (bRight && bLeft) {
-            return IDL_NAMESPACE_STR + "Stream.Map(" + getDataType(mPtr->getLeftTypePtr(), bCastEnumAsAny) + ", " + getDataType(mPtr->getRightTypePtr(), bCastEnumAsAny) + ", 1, 1)";
-        } else if (bRight) {
-            return IDL_NAMESPACE_STR + "Stream.Map(" + getDataType(mPtr->getLeftTypePtr(), bCastEnumAsAny) + ", " + getDataType(mPtr->getRightTypePtr(), bCastEnumAsAny) + ", 0, 1)";
-        } else if (bLeft) {
-            return IDL_NAMESPACE_STR + "Stream.Map(" + getDataType(mPtr->getLeftTypePtr(), bCastEnumAsAny) + ", " + getDataType(mPtr->getRightTypePtr(), bCastEnumAsAny) + ", 1)";
-        } else {
-            assert(false);
-        }
+        return IDL_NAMESPACE_STR + "Stream.Map(" + getDataType(mPtr->getLeftTypePtr(), bCastEnumAsAny) + ", " +
+                getDataType(mPtr->getRightTypePtr(), bCastEnumAsAny) +
+                representArgument(mPtr->getLeftTypePtr()) +
+                representArgument(mPtr->getRightTypePtr()) + ")";
     }
 
     EnumPtr ePtr = EnumPtr::dynamicCast(pPtr);
@@ -221,9 +212,18 @@ string CodeGenerator::getTsType(const TypePtr &pPtr, const bool bStream, const b
             case Builtin::KindByte   : return "number";
             case Builtin::KindShort  : return "number";
             case Builtin::KindInt    : return "number";
-            case Builtin::KindLong   : return _bUseStringRepresent ? "string" : "number";
             case Builtin::KindFloat  : return "number";
             case Builtin::KindDouble : return "number";
+            case Builtin::KindLong   :
+            {
+                switch (_iLongType)
+                {
+                    case CodeGenerator::Number : return "number";
+                    case CodeGenerator::String : return "string";
+                    case CodeGenerator::BigInt : return "bigint";
+                    default                    : assert(false);
+                }
+            }
             default                  : assert(false);
         }
     }
@@ -375,11 +375,20 @@ string CodeGenerator::getDefault(const TypeIdPtr & pPtr, const string &sDefault,
                     sTemp = "0";
                 }
 
-                if (_bUseStringRepresent)
+                if (bPtr->kind() == Builtin::KindLong)
                 {
-                    if (bPtr->kind() == Builtin::KindLong)
+                    switch (_iLongType)
                     {
-                        sTemp = "\"" + sTemp + "\"";
+                        case CodeGenerator::String:
+                        {
+                            sTemp = "\"" + sTemp + "\"";
+                            break;
+                        }
+                        case CodeGenerator::BigInt:
+                        {
+                            sTemp = sTemp + "n";
+                            break;
+                        }
                     }
                 }
 

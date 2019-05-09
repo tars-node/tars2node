@@ -16,23 +16,23 @@ tars2node [OPTIONS] tarsfile
 
 | 选项 | 作用 |
 | ------------- | ------------- |
-| --stream-path=[DIRECTORY]  | 指定编解码模块名称，默认为 @tars/stream。 |
-| --rpc-path=[DIRECTORY]     | 指定 RPC 模块名称，默认为 @tars/rpc。 |
-| --allow-reserved-namespace | 是否允许 `tars` 作为命名空间（因为此命名空间主要用于框架服务的 tars 文件定义）。 |
-| --dir=[DIRECTORY]          | 生成文件的输出目录。 |
-| --relative                 | 限定所有的 `.tars` 文件都在当前目录寻找。|
-| --tarsBase=[DIRECTORY]     | 指定 `.tars` 文件的搜索目录。|
-| --r                        | 转换嵌套的 `.tars` 文件。|
-| --r-minimal                | 精简依赖文件，移除非必须成员。|
-| --r-reserved               | 精简依赖文件时需保留的成员。|
-| --client                   | 生成客户端的调用类代码。|
-| --server                   | 生成服务端的框架代码。|
-| --ts                       | 打开此选项将后将只生成 TypeScript (.ts) 代码。|
-| --dts                      | 生成时附加 TypeScript 描述文件（.d.ts）。|
-| --use-string-represent     | 当需要保持 <long> 类型的精度时，打开此选项使用 \<string\> 存储 \<long\>。|
-| --string-binary-encoding   | 遇到字符编码问题或需对原始数据进行存取时，打开此选项使用 \<buffer\> 存储 \<string\>。|
-| --enum-reverse-mappings    | 输出代码 \<enum\> 支持枚举值到枚举名的反向映射 。|
-| --optimize=[0\|s]          | 优化输出代码大小，默认为 0（也就是不优化）。|
+| --stream-path=[DIRECTORY]              | 指定编解码模块名称，默认为 @tars/stream。 |
+| --rpc-path=[DIRECTORY]                 | 指定 RPC 模块名称，默认为 @tars/rpc。 |
+| --allow-reserved-namespace             | 是否允许 `tars` 作为命名空间（因为此命名空间主要用于框架服务的 tars 文件定义）。 |
+| --dir=[DIRECTORY]                      | 生成文件的输出目录。 |
+| --relative                             | 限定所有的 `.tars` 文件都在当前目录寻找。|
+| --tarsBase=[DIRECTORY]                 | 指定 `.tars` 文件的搜索目录。|
+| --r                                    | 转换嵌套的 `.tars` 文件。|
+| --r-minimal                            | 精简依赖文件，移除非必须成员。|
+| --r-reserved                           | 精简依赖文件时需保留的成员。|
+| --client                               | 生成客户端的调用类代码。|
+| --server                               | 生成服务端的框架代码。|
+| --ts                                   | 打开此选项将后将只生成 TypeScript (.ts) 代码。|
+| --dts                                  | 生成时附加 TypeScript 描述文件（.d.ts）。|
+| --long-type=[number|string|bigint]     | 可选择使用 \<Number\|String\|BigInt\> 表达 \<long\> 类型，默认值为 \<Number\>。|
+| --string-binary-encoding               | 遇到字符编码问题或需对原始数据进行存取时，打开此选项使用 \<buffer\> 存储 \<string\>。|
+| --enum-reverse-mappings                | 输出代码 \<enum\> 支持枚举值到枚举名的反向映射 。|
+| --optimize=[0\|s]                      | 优化输出代码大小，默认为 0（也就是不优化）。|
 
 ## 例子
 

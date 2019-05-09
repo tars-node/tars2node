@@ -77,7 +77,7 @@ public:
           _bServer(false),
           _bRecursive(false),
           _bUseSpecialPath(false),
-          _bUseStringRepresent(false),
+          _iLongType(Number),
           _bStringBinaryEncoding(false),
           _bEnumReverseMappings(false),
           _bMinimalMembers(false),
@@ -101,7 +101,7 @@ public:
 
     void setUseSpecialPath(bool bEnable) { _bUseSpecialPath = bEnable; }
 
-    void setUseStringRepresent(bool bEnable) { _bUseStringRepresent = bEnable; }
+    void setLongType(int iLongType) { _iLongType = iLongType; }
 
     void setStringBinaryEncoding(bool bEnable) { _bStringBinaryEncoding = bEnable; }
 
@@ -118,6 +118,8 @@ public:
     void setOptimize(int iLevel) { _iOptimizeLevel = iLevel; }
 
     enum OPTIMIZE_LEVEL {O0 = 0, Os};
+
+    enum LONG_TYPE {Number = 0, String, BigInt};
 
 private:
     struct ImportFileType
@@ -273,7 +275,7 @@ private:
 
     bool   isBinBuffer(const TypePtr & pPtr) const;
 
-    bool   isRawOrString(const TypePtr & pPtr) const;
+    string representArgument(const TypePtr& pPtr) const;
 
     bool   isDependent(const string & sNamespace, const string & sName) const;
 
@@ -298,7 +300,7 @@ private:
 
     bool   _bUseSpecialPath;
 
-    bool   _bUseStringRepresent;
+    int    _iLongType;
 
     bool   _bStringBinaryEncoding;
 
