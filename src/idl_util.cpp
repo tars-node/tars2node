@@ -180,10 +180,16 @@ string CodeGenerator::getDataType(const TypePtr& pPtr, const bool &bCastEnumAsAn
     MapPtr mPtr = MapPtr::dynamicCast(pPtr);
     if (mPtr)
     {
+        string sLeft = representArgument(mPtr->getLeftTypePtr());
+        string sRight = representArgument(mPtr->getRightTypePtr());
+
+        if (sLeft.empty() && !sRight.empty())
+        {
+            sLeft = ", 0";
+        }
+
         return IDL_NAMESPACE_STR + "Stream.Map(" + getDataType(mPtr->getLeftTypePtr(), bCastEnumAsAny) + ", " +
-                getDataType(mPtr->getRightTypePtr(), bCastEnumAsAny) +
-                representArgument(mPtr->getLeftTypePtr()) +
-                representArgument(mPtr->getRightTypePtr()) + ")";
+                getDataType(mPtr->getRightTypePtr(), bCastEnumAsAny) + sLeft + sRight + ")";
     }
 
     EnumPtr ePtr = EnumPtr::dynamicCast(pPtr);
