@@ -19,11 +19,7 @@
 void CodeGenerator::makeUTF8File(const string& sFileName, const string& sFileContent) 
 {
     try {
-        char header[3] = {(char)(0xef), (char)(0xbb), (char)(0xbf)};
-
-        string sData(header, 3);
-
-        sData += TC_Encoder::gbk2utf8(sFileContent);
+        string sData = TC_Encoder::gbk2utf8(sFileContent);
 
         TC_File::save2file(sFileName, sData.c_str());
     } catch (...) {
