@@ -30,16 +30,6 @@ string CodeGenerator::printHeaderRemark(const string &sTypeName)
     return s.str();
 }
 
-string CodeGenerator::printHeaderRemark(const string &sTypeName, const string &sSuffix)
-{
-    ostringstream s;
-    s << printHeaderRemark(sTypeName);
-    s << sSuffix << endl;
-    s << endl;
-
-    return s.str();
-}
-
 void CodeGenerator::createFile(const string &file, const bool bEntry)
 {
     _sIdlFile = getRealFileInfo(file);

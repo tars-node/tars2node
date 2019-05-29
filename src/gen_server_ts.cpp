@@ -361,7 +361,10 @@ bool CodeGenerator::generateTSServer(const ContextPtr &pPtr)
     ostringstream str;
 
     // generate the source file
-    str << printHeaderRemark("Server", DISABLE_TSLINT);
+    str << printHeaderRemark("Server");
+    str << DISABLE_TSLINT << endl;
+    str << DISABLE_ESLINT << endl;
+    str << endl;
     str << "/// <reference types=\"node\" />" << endl;
     if (bNeedAssert)
     {

@@ -229,7 +229,10 @@ void CodeGenerator::generateDTS(const ContextPtr &pPtr)
 
     // concat generated code
     ostringstream sstr;
-    sstr << printHeaderRemark("Structure", DISABLE_TSLINT);
+    sstr << printHeaderRemark("Structure");
+    sstr << DISABLE_TSLINT << endl;
+    sstr << DISABLE_ESLINT << endl;
+    sstr << endl;
     sstr << ostr.str() << endl;
     sstr << estr.str() << endl;
 

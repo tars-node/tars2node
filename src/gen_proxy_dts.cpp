@@ -130,7 +130,10 @@ void CodeGenerator::generateDTSProxy(const ContextPtr &cPtr)
 
     // concat generated code
     ostringstream sstr;
-    sstr << printHeaderRemark("Client", DISABLE_TSLINT);
+    sstr << printHeaderRemark("Client");
+    sstr << DISABLE_TSLINT << endl;
+    sstr << DISABLE_ESLINT << endl;
+    sstr << endl;
     if (bNeedStream)
     {
         sstr << "import * as " << IDL_NAMESPACE_STR << "Stream from \"" << _sStreamPath << "\";" << endl;

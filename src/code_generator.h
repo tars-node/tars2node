@@ -283,8 +283,6 @@ private:
 
     string printHeaderRemark(const string &sTypeName);
 
-    string printHeaderRemark(const string &sTypeName, const string &sSuffix);
-
 private:
     string _sRpcPath;
 

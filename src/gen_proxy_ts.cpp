@@ -427,7 +427,10 @@ bool CodeGenerator::generateTSProxy(const ContextPtr &cPtr)
 
     // generate module imports
     ostringstream sstr;
-    sstr << printHeaderRemark("Client", DISABLE_TSLINT);
+    sstr << printHeaderRemark("Client");
+    sstr << DISABLE_TSLINT << endl;
+    sstr << DISABLE_ESLINT << endl;
+    sstr << endl;
     sstr << "/// <reference types=\"node\" />" << endl;
     if (bNeedAssert)
     {

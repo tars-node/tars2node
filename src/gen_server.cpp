@@ -372,7 +372,9 @@ bool CodeGenerator::generateJSServer(const ContextPtr &pPtr)
 
     ostringstream str;
 
-    str << printHeaderRemark("Server", DISABLE_ESLINT);
+    str << printHeaderRemark("Server");
+    str << DISABLE_ESLINT << endl;
+    str << endl;
     str << "\"use strict\";" << endl << endl;
     str << ostr.str() << endl;
     str << istr.str();

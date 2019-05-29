@@ -479,7 +479,9 @@ bool CodeGenerator::generateJSProxy(const ContextPtr &cPtr)
 
     // concat generated code    
     ostringstream sstr;
-    sstr << printHeaderRemark("Client", DISABLE_ESLINT);
+    sstr << printHeaderRemark("Client");
+    sstr << DISABLE_ESLINT << endl;
+    sstr << endl;
     sstr << "\"use strict\";" << endl << endl;
     if (bNeedAssert)
     {

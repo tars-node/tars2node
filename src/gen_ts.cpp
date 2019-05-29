@@ -431,7 +431,10 @@ void CodeGenerator::generateTS(const ContextPtr &pPtr)
 
     // concat generated code
     ostringstream sstr;
-    sstr << printHeaderRemark("Structure", DISABLE_TSLINT);
+    sstr << printHeaderRemark("Structure");
+    sstr << DISABLE_TSLINT << endl;
+    sstr << DISABLE_ESLINT << endl;
+    sstr << endl;
     sstr << "/// <reference types=\"node\" />" << endl;
     sstr << ostr.str() << endl;
     sstr << estr.str() << endl;

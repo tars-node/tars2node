@@ -416,7 +416,9 @@ bool CodeGenerator::generateJS(const ContextPtr &pPtr)
 
     // concat generated code
     ostringstream sstr;
-    sstr << printHeaderRemark("Structure", DISABLE_ESLINT);
+    sstr << printHeaderRemark("Structure");
+    sstr << DISABLE_ESLINT << endl;
+    sstr << endl;
     sstr << "\"use strict\";" << endl << endl;
     if (bNeedAssert)
     {
