@@ -117,11 +117,11 @@ string CodeGenerator::generateTS(const StructPtr &pPtr, const string &sNamespace
     s << TAB << "protected static _classname = \"" << sNamespace << "." << pPtr->getId() << "\";" << endl;
 
     // _write, _read
-    s << TAB << "protected static _write(os: " << IDL_NAMESPACE_STR << "Stream.JceOutputStream, tag: number, val: any) { os.writeStruct(tag, val); }" << endl;
-	s << TAB << "protected static _read(is: " << IDL_NAMESPACE_STR << "Stream.JceInputStream, tag: number, def?: any) { return is.readStruct(tag, true, def); }" << endl;
+    s << TAB << "protected static _write(os: " << IDL_NAMESPACE_STR << "Stream.TarsOutputStream, tag: number, val: any) { os.writeStruct(tag, val); }" << endl;
+	s << TAB << "protected static _read(is: " << IDL_NAMESPACE_STR << "Stream.TarsInputStream, tag: number, def?: any) { return is.readStruct(tag, true, def); }" << endl;
 
     // _readFrom
-    s << TAB << "protected static _readFrom(is: " << IDL_NAMESPACE_STR << "Stream.JceInputStream) {" << endl;
+    s << TAB << "protected static _readFrom(is: " << IDL_NAMESPACE_STR << "Stream.TarsInputStream) {" << endl;
     INC_TAB;
 
     s << TAB << "const tmp = new " << pPtr->getId() << ";" << endl;
@@ -148,7 +148,7 @@ string CodeGenerator::generateTS(const StructPtr &pPtr, const string &sNamespace
     s << TAB << "}" << endl << endl;
 
     // _writeTo
-    s << TAB << "protected _writeTo(os: " << IDL_NAMESPACE_STR << "Stream.JceOutputStream) {" << endl;
+    s << TAB << "protected _writeTo(os: " << IDL_NAMESPACE_STR << "Stream.TarsOutputStream) {" << endl;
     INC_TAB;
     for (size_t i = 0; i < member.size(); i++)
     {
@@ -289,7 +289,7 @@ string CodeGenerator::generateTS(const StructPtr &pPtr, const string &sNamespace
         s << TAB << "}" << endl << endl;
 
         // create
-        s << TAB << "static create(is: " << IDL_NAMESPACE_STR << "Stream.JceInputStream) {" << endl;
+        s << TAB << "static create(is: " << IDL_NAMESPACE_STR << "Stream.TarsInputStream) {" << endl;
         INC_TAB;
         s << TAB << "return " << sNamespace << "." << pPtr->getId() << "._readFrom(is);" << endl;
         DEL_TAB;
