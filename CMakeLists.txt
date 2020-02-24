@@ -21,7 +21,7 @@ set(IDL_TYPE "Tars")
 set(PROTOCOL_NAME "Tup")
 
 # flag
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O2 -Wall -Wno-sign-compare -Wno-unused-result -static")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O2 -Wall -Wno-sign-compare -Wno-unused-result")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -Wall -static")
 
 # define
