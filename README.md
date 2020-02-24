@@ -1,5 +1,7 @@
 # Tars2Node
 
+[![Build Status](https://travis-ci.org/LyleLee/tars2node.svg?branch=master)](https://travis-ci.org/LyleLee/tars2node)
+
 `tars2node` 可以将 Tars IDL 定义文件转换为 JavaScript 语言所使用的版本，结合 [@tars/stream](https://www.npmjs.com/package/@tars/stream) 模块执行编解码操作。
 
 如您有 Tars RPC 需求可结合 [@tars/rpc](https://www.npmjs.com/package/@tars/rpc) 模块进行调用。
