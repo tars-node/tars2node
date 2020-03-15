@@ -121,6 +121,7 @@ int main(int argc, char* argv[])
     #undef ALLOW_USE_RESERVED_NAMESPACE_BASE
     #undef ALLOW_USE_RESERVED_NAMESPACE_V
 
+	    g_parse->setTars(option.hasParam("with-tars"));
         g_parse->setUseCurrentPath(option.hasParam("relative"));
 
         CodeGenerator generator;

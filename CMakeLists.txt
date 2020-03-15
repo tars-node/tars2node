@@ -5,9 +5,9 @@ project(tars2node)
 set(CMAKE_VERBOSE_MAKEFILE off)
 
 # version
-set(TARS_VERSION "1.1.0")
+set(TARS_VERSION "1.2.0")
 set(PARSER_VERSION "${TARS_VERSION}")
-set(GENERATOR_VERSION "20190529")
+set(GENERATOR_VERSION "20200315")
 
 # namespace
 set(IDL_NAMESPACE Tars)
@@ -20,9 +20,39 @@ set(STREAM_MODULE_PATH "@tars/stream")
 set(IDL_TYPE "Tars")
 set(PROTOCOL_NAME "Tup")
 
-# flag
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -O2 -Wall -Wno-sign-compare -Wno-unused-result -static")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O2 -Wall -static")
+IF (APPLE)
+link_libraries(iconv)
+ENDIF(APPLE)
+
+set(PLATFORM)
+IF (UNIX)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++11  -Wno-deprecated -fno-strict-aliasing -Wno-overloaded-virtual")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-builtin-macro-redefined -D__FILE__='\"$(notdir $(abspath $<))\"'")
+    
+    set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -Wall -g")
+    set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O2 -Wall -fno-strict-aliasing")
+
+    set(PLATFORM "linux")
+    IF(APPLE)
+        set(PLATFORM "mac")
+        SET(CMAKE_C_ARCHIVE_CREATE   "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+        SET(CMAKE_CXX_ARCHIVE_CREATE "<CMAKE_AR> Scr <TARGET> <LINK_FLAGS> <OBJECTS>")
+        SET(CMAKE_C_ARCHIVE_FINISH   "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+        SET(CMAKE_CXX_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
+    ENDIF(APPLE)
+
+ELSEIF (WIN32)
+    set(PLATFORM "window")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4101 /wd4244 /wd4996 /wd4091 /wd4503 /wd4819 /wd4200 /wd4800 /wd4267 /wd4834 /wd4267")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj " )
+
+ELSE ()
+    MESSAGE(STATUS "================ ERROR: This platform is unsupported!!! ================")
+ENDIF (UNIX)
+
+#编译的可执行程序输出目录
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PLATFORM}/bin)
 
 # define
 add_definitions(-DTARS_VERSION="${TARS_VERSION}")

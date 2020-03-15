@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Tencent is pleased to support the open source community by making Tars available.
  *
  * Copyright (C) 2016THL A29 Limited, a Tencent company. All rights reserved.
@@ -15,204 +15,291 @@
  */
 
 #include "util/tc_common.h"
+#include "util/tc_port.h"
+#include <chrono>
+#include <thread>
+
+#if TARGET_PLATFORM_WINDOWS
+#include <sys/timeb.h>
+#pragma comment(lib, "ws2_32.lib")
+#include "util/tc_strptime.h"
+#endif
+
+// #if TARGET_PLATFORM_WINDOWS || TARGET_PLATFORM_IOS
+// #define HOST_NAME_MAX 64
+// #endif
+
 #include <signal.h>
-#include <sys/time.h>
 #include <string.h>
 #include <cmath>
 
 namespace tars
 {
+
+const float TC_Common::_EPSILON_FLOAT = 0.000001f;
+const double TC_Common::_EPSILON_DOUBLE = 0.000001;
+
+void TC_Common::sleep(uint32_t sec)
+{
+    std::this_thread::sleep_for(std::chrono::seconds(sec));
+}
+
+void TC_Common::msleep(uint32_t ms)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+}
+
+bool TC_Common::equal(double x, double y, double epsilon)
+{
+    return fabs(x - y) < epsilon;
+}
+
+bool TC_Common::equal(double x, double y, float epsilon)
+{
+    return equal(x ,y,(double)epsilon);
+}
+
+bool TC_Common::equal(float x, float y, float epsilon)
+{
+    return fabsf(x - y) < epsilon;
+}
+
+bool TC_Common::equal(float x, float y, double epsilon)
+{
+    return equal(x, y, float(epsilon));
+}
+
+bool TC_Common::equal(const vector<double>& vx, const vector<double>& vy, double epsilon)
+{
+    if (vx.size() != vy.size())
+    {
+        return false;
+    }
+    
+    for (size_t i = 0; i < vx.size(); i ++)
+    {
+        if (!equal(vx[i],vy[i],epsilon))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool TC_Common::equal(const vector<double>& vx, const vector<double>& vy, float epsilon)
+{
+    return equal(vx, vy, double(epsilon));
+}
+
+bool TC_Common::equal(const vector<float>& vx, const vector<float>& vy, float epsilon)
+{
+    if (vx.size() != vy.size())
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < vx.size(); i++)
+    {
+        if (!equal(vx[i], vy[i], epsilon))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool TC_Common::equal(const vector<float>& vx, const vector<float>& vy, double epsilon)
+{
+    return equal(vx, vy, float(epsilon));
+}
 template <>
 string TC_Common::tostr<bool>(const bool &t)
 {
-    char buf[2];
-    buf[0] = t ? '1' : '0';
-    buf[1] = '\0';
-    return string(buf);
+	char buf[2];
+	buf[0] = t ? '1' : '0';
+	buf[1] = '\0';
+	return string(buf);
 }
 
 
 template <>
 string TC_Common::tostr<char>(const char &t)
 {
-    char buf[2];
-    snprintf(buf, 2, "%c", t);
-    return string(buf);
+	char buf[2];
+	snprintf(buf, 2, "%c", t);
+	return string(buf);
 }
 
 template <>
 string TC_Common::tostr<unsigned char>(const unsigned char &t)
 {
-    char buf[2];
-    snprintf(buf, 2, "%c", t);
-    return string(buf);
+	char buf[2];
+	snprintf(buf, 2, "%c", t);
+	return string(buf);
 }
 
 template <>
 string TC_Common::tostr<short>(const short &t)
 {
-    char buf[16];
-    snprintf(buf, 16, "%d", t);
-    return string(buf);
+	char buf[16];
+	snprintf(buf, 16, "%d", t);
+	return string(buf);
 }
 
 template <>
 string TC_Common::tostr<unsigned short>(const unsigned short &t)
 {
-    char buf[16];
-    snprintf(buf, 16, "%u", t);
-    return string(buf);
+	char buf[16];
+	snprintf(buf, 16, "%u", t);
+	return string(buf);
 }
 
 template <>
 string TC_Common::tostr<int>(const int &t)
 {
-    char buf[16];
-    snprintf(buf, 16, "%d", t);
-    return string(buf);
+	char buf[16];
+	snprintf(buf, 16, "%d", t);
+	return string(buf);
 }
 
 template <>
 string TC_Common::tostr<unsigned int>(const unsigned int &t)
 {
-    char buf[16];
-    snprintf(buf, 16, "%u", t);
-    return string(buf);
+	char buf[16];
+	snprintf(buf, 16, "%u", t);
+	return string(buf);
 }
 
 template <>
 string TC_Common::tostr<long>(const long &t)
 {
-    char buf[32];
-    snprintf(buf, 32, "%ld", t);
-    return string(buf);
+	char buf[32];
+	snprintf(buf, 32, "%ld", t);
+	return string(buf);
 }
 
 template <>
 string TC_Common::tostr<long long>(const long long &t)
 {
-    char buf[32];
-    snprintf(buf, 32, "%lld", t);
-    return string(buf);
+	char buf[32];
+	snprintf(buf, 32, "%lld", t);
+	return string(buf);
 }
 
 
 template <>
 string TC_Common::tostr<unsigned long>(const unsigned long &t)
 {
-    char buf[32];
-    snprintf(buf, 32, "%lu", t);
-    return string(buf);
+	char buf[32];
+	snprintf(buf, 32, "%lu", t);
+	return string(buf);
 }
 
 template <>
 string TC_Common::tostr<float>(const float &t)
 {
-    char buf[32];
-    snprintf(buf, 32, "%.5f", t);
-    string s(buf);
+    //C++11 to_string，默认保留后面6位小数
+    string s = std::to_string(t);
 
-    //去掉无效0, eg. 1.0300 -> 1.03;1.00 -> 1
-    bool bFlag = false;
-    int pos = int(s.size() - 1);
-    for(; pos > 0; --pos)
-    {
-        if(s[pos] == '0')
-        {
-            bFlag = true;
-            if(s[pos-1] == '.')
-            {
-                //-2为了去掉"."号
-                pos -= 2;
-                break;
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
+	//去掉无效0, eg. 1.0300 -> 1.03;1.00 -> 1
+	bool bFlag = false;
+	int pos = int(s.size() - 1);
+	for(; pos > 0; --pos)
+	{
+		if(s[pos] == '0')
+		{
+			bFlag = true;
+			if(s[pos-1] == '.')
+			{
+				//-2为了去掉"."号
+				pos -= 2;
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
 
-    if(bFlag)
-        s = s.substr(0, pos+1);
+	if(bFlag)
+		s = s.substr(0, pos + 1);
 
-    return s;
+	return s;
 }
 
 template <>
 string TC_Common::tostr<double>(const double &t)
 {
-    char buf[32];
-    snprintf(buf, 32, "%.5f", t);
-    string s(buf);
+    //C++11 to_string，默认保留后面6位小数
+    string s = std::to_string(t);
+	//去掉无效0, eg. 1.0300 -> 1.03;1.00 -> 1
+	bool bFlag = false;
+	int pos = int(s.size() - 1);
+	for(; pos > 0; --pos)
+	{
+		if(s[pos] == '0')
+		{
+			bFlag = true;
+			if(s[pos-1] == '.')
+			{
+				//-2为了去掉"."号
+				pos -= 2;
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
 
-    //去掉无效0, eg. 1.0300 -> 1.03;1.00 -> 1
-    bool bFlag = false;
-    int pos = int(s.size() - 1);
-    for(; pos > 0; --pos)
-    {
-        if(s[pos] == '0')
-        {
-            bFlag = true;
-            if(s[pos-1] == '.')
-            {
-                //-2为了去掉"."号
-                pos -= 2;
-                break;
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
+	if(bFlag)
+		s = s.substr(0, pos + 1);
 
-    if(bFlag)
-        s = s.substr(0, pos+1);
-
-    return s;
+	return s;
 
 }
 
 template <>
 string TC_Common::tostr<long double>(const long double &t)
 {
-    char buf[32];
-    snprintf(buf, 32, "%Lf", t);
-    string s(buf);
+	char buf[32];
+	snprintf(buf, 32, "%Lf", t);
+	string s(buf);
 
-    //去掉无效0, eg. 1.0300 -> 1.03;1.00 -> 1
-    bool bFlag = false;
-    int pos = int(s.size() - 1);
-    for(; pos > 0; --pos)
-    {
-        if(s[pos] == '0')
-        {
-            bFlag = true;
-            if(s[pos-1] == '.')
-            {
-                //-2为了去掉"."号
-                pos -= 2;
-                break;
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
+	//去掉无效0, eg. 1.0300 -> 1.03;1.00 -> 1
+	bool bFlag = false;
+	int pos = int(s.size() - 1);
+	for(; pos > 0; --pos)
+	{
+		if(s[pos] == '0')
+		{
+			bFlag = true;
+			if(s[pos-1] == '.')
+			{
+				//-2为了去掉"."号
+				pos -= 2;
+				break;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
 
-    if(bFlag)
-        s = s.substr(0, pos+1);
+	if(bFlag)
+		s = s.substr(0, pos + 1);
 
-    return s;
+	return s;
 
 }
 
 template <>
 string TC_Common::tostr<std::string>(const std::string &t)
 {
-    return t;
+	return t;
 }
 
 string TC_Common::trim(const string &sStr, const string &s, bool bChar)
@@ -227,10 +314,10 @@ string TC_Common::trim(const string &sStr, const string &s, bool bChar)
     */
     if(!bChar)
     {
-        return trimright(trimleft(sStr, s, false), s, false);
+		return trimright(trimleft(sStr, s, false), s, false);
     }
 
-    return trimright(trimleft(sStr, s, true), s, true);
+	return trimright(trimleft(sStr, s, true), s, true);
 }
 
 string TC_Common::trimleft(const string &sStr, const string &s, bool bChar)
@@ -252,7 +339,7 @@ string TC_Common::trimleft(const string &sStr, const string &s, bool bChar)
 
         if(sStr.compare(0, s.length(), s) == 0)
         {
-            return sStr.substr(s.length());
+			return sStr.substr(s.length());
         }
 
         return sStr;
@@ -274,7 +361,7 @@ string TC_Common::trimleft(const string &sStr, const string &s, bool bChar)
 
     if(pos == 0) return sStr;
 
-    return sStr.substr(pos);
+	return sStr.substr(pos);
 }
 
 string TC_Common::trimright(const string &sStr, const string &s, bool bChar)
@@ -296,7 +383,7 @@ string TC_Common::trimright(const string &sStr, const string &s, bool bChar)
 
         if(sStr.compare(sStr.length() - s.length(), s.length(), s) == 0)
         {
-            return sStr.substr(0, sStr.length() - s.length());
+			return sStr.substr(0, sStr.length() - s.length());
         }
 
         return sStr;
@@ -318,7 +405,7 @@ string TC_Common::trimright(const string &sStr, const string &s, bool bChar)
 
     if(pos == sStr.length()) return sStr;
 
-    return sStr.substr(0, pos);
+	return sStr.substr(0, pos);
 }
 
 string TC_Common::lower(const string &s)
@@ -329,7 +416,7 @@ string TC_Common::lower(const string &s)
         *iter = tolower(*iter);
     }
 
-    return sString;
+	return sString;
 }
 
 string TC_Common::upper(const string &s)
@@ -341,7 +428,7 @@ string TC_Common::upper(const string &s)
         *iter = toupper(*iter);
     }
 
-    return sString;
+	return sString;
 }
 
 bool TC_Common::isdigit(const string &sInput)
@@ -364,15 +451,56 @@ bool TC_Common::isdigit(const string &sInput)
     return true;
 }
 
+
+//用于计算时区差异!
+class TimezoneHelper
+{
+public:
+	TimezoneHelper()
+	{
+		struct tm timeinfo;
+		time_t secs, local_secs, gmt_secs;
+		time(&secs);
+
+		//带时区时间
+        TC_Port::localtime_r(&secs, &timeinfo);
+
+		local_secs = ::mktime(&timeinfo);
+
+		//不带时区时间
+        TC_Port::gmtime_r(&secs, &timeinfo);
+
+		gmt_secs = ::mktime(&timeinfo);
+		timezone_diff_secs = local_secs - gmt_secs;
+	}
+
+	static int64_t timezone_diff_secs;
+};
+
+int64_t TimezoneHelper::timezone_diff_secs = 0;
+
+
 int TC_Common::str2tm(const string &sString, const string &sFormat, struct tm &stTm)
 {
     char *p = strptime(sString.c_str(), sFormat.c_str(), &stTm);
     return (p != NULL) ? 0 : -1;
 }
 
+time_t TC_Common::str2time(const string &sString, const string &sFormat)
+{
+	struct tm stTm;
+	if (0 == str2tm(sString, sFormat, stTm))
+	{
+		//注意这里没有直接用mktime, mktime会访问时区文件, 会巨慢!
+		static TimezoneHelper helper;
+		return TC_Port::timegm(&stTm) - TimezoneHelper::timezone_diff_secs;
+	}
+	return 0;
+}
+
 int TC_Common::strgmt2tm(const string &sString, struct tm &stTm)
 {
-    return str2tm(sString, "%a, %d %b %Y %H:%M:%S GMT", stTm);
+	return str2tm(sString, "%a, %d %b %Y %H:%M:%S GMT", stTm);
 }
 
 string TC_Common::tm2str(const struct tm &stTm, const string &sFormat)
@@ -381,65 +509,91 @@ string TC_Common::tm2str(const struct tm &stTm, const string &sFormat)
 
     strftime(sTimeString, sizeof(sTimeString), sFormat.c_str(), &stTm);
 
-    return string(sTimeString);
+	return string(sTimeString);
+}
+
+int TC_Common::gettimeofday(struct timeval &tv)
+{
+    return TC_Port::gettimeofday(tv);
+
+}
+
+void TC_Common::tm2time(const time_t &t, struct tm &tt)
+{
+	//加快速度, 否则会比较慢, 不用localtime_r(会访问时区文件, 较慢)
+	static TimezoneHelper helper;
+	time_t localt = t + TimezoneHelper::timezone_diff_secs;
+
+    TC_Port::gmtime_r(&localt, &tt);
+
 }
 
 string TC_Common::tm2str(const time_t &t, const string &sFormat)
 {
-    struct tm tt;
-    localtime_r(&t, &tt);
+	struct tm tt;
+	tm2time(t, tt);
 
-    return tm2str(tt, sFormat);
+	return tm2str(tt, sFormat);
+}
+
+void TC_Common::tm2tm(const time_t &t, struct tm &tt)
+{
+	static TimezoneHelper helper;
+	time_t localt = t + TimezoneHelper::timezone_diff_secs;
+
+    TC_Port::gmtime_r(&localt, &tt);
+
 }
 
 string TC_Common::now2str(const string &sFormat)
 {
     time_t t = time(NULL);
-    return tm2str(t, sFormat.c_str());
+	return tm2str(t, sFormat.c_str());
 }
 
 string TC_Common::now2GMTstr()
 {
     time_t t = time(NULL);
-    return tm2GMTstr(t);
+	return tm2GMTstr(t);
 }
 
 string TC_Common::tm2GMTstr(const time_t &t)
 {
     struct tm tt;
-    gmtime_r(&t, &tt);
-    return tm2str(tt, "%a, %d %b %Y %H:%M:%S GMT");
+
+    TC_Port::gmtime_r(&t, &tt);	
+	return tm2str(tt, "%a, %d %b %Y %H:%M:%S GMT");
 }
 
 string TC_Common::tm2GMTstr(const struct tm &stTm)
 {
-    return tm2str(stTm, "%a, %d %b %Y %H:%M:%S GMT");
+	return tm2str(stTm, "%a, %d %b %Y %H:%M:%S GMT");
 }
 
 string TC_Common::nowdate2str()
 {
-    return now2str("%Y%m%d");
+	return now2str("%Y%m%d");
 }
 
 string TC_Common::nowtime2str()
 {
-    return now2str("%H%M%S");
+	return now2str("%H%M%S");
 }
 
 int64_t TC_Common::now2ms()
 {
-    struct timeval tv;
+	struct timeval tv;
 
-    gettimeofday(&tv, 0);
+    TC_Common::gettimeofday(tv);
 
-    return tv.tv_sec * (int64_t)1000 + tv.tv_usec/1000;
+	return tv.tv_sec * (int64_t)1000 + tv.tv_usec/1000;
 }
 
 int64_t TC_Common::now2us()
 {
     struct timeval tv;
 
-    gettimeofday(&tv, 0);
+	TC_Common::gettimeofday(tv);
 
     return tv.tv_sec * (int64_t)1000000 + tv.tv_usec;
 }
@@ -470,17 +624,17 @@ string TC_Common::bin2str(const void *buf, size_t len, const string &sSep, size_
         }
     }
 
-    return sOut;
+	return sOut;
 }
 
 string TC_Common::bin2str(const string &sBinData, const string &sSep, size_t lines)
 {
-    return bin2str((const void *)sBinData.data(), sBinData.length(), sSep, lines);
+	return bin2str((const void *) sBinData.data(), sBinData.length(), sSep, lines);
 }
 
 int TC_Common::str2bin(const char *psAsciiData, unsigned char *sBinData, int iBinSize)
 {
-    int iAsciiLength = strlen(psAsciiData);
+    int iAsciiLength = (int)strlen(psAsciiData);
 
     int iRealLength = (iAsciiLength/2 > iBinSize)?iBinSize:(iAsciiLength/2);
     for (int i = 0 ; i < iRealLength ; i++)
@@ -494,9 +648,9 @@ string TC_Common::str2bin(const string &sString, const string &sSep, size_t line
 {
     const char *psAsciiData = sString.c_str();
 
-    int iAsciiLength = sString.length();
+    size_t iAsciiLength = sString.length();
     string sBinData;
-    for (int i = 0 ; i < iAsciiLength ; i++)
+    for (size_t i = 0 ; i < iAsciiLength ; i++)
     {
         sBinData += x2c(psAsciiData + i);
         i++;
@@ -508,7 +662,7 @@ string TC_Common::str2bin(const string &sString, const string &sSep, size_t line
         }
     }
 
-    return sBinData;
+	return sBinData;
 }
 
 char TC_Common::x2c(const string &sWhat)
@@ -544,33 +698,33 @@ string TC_Common::replace(const string &sString, const string &sSrc, const strin
         pos += sDest.length();
     }
 
-    return sBuf;
+	return sBuf;
 }
 
 string TC_Common::replace(const string &sString, const map<string,string>& mSrcDest)
 {
-    if(sString.empty())
-    {
-        return sString;
-    }
+	if(sString.empty())
+	{
+		return sString;
+	}
 
-    string tmp = sString;
-    map<string,string>::const_iterator it = mSrcDest.begin();
+	string tmp = sString;
+	map<string,string>::const_iterator it = mSrcDest.begin();
 
-    while(it != mSrcDest.end())
-    {
+	while(it != mSrcDest.end())
+	{
 
-        string::size_type pos = 0;
-        while((pos = tmp.find(it->first, pos)) != string::npos)
-        {
-            tmp.replace(pos, it->first.length(), it->second);
-            pos += it->second.length();
-        }
+		string::size_type pos = 0;
+		while((pos = tmp.find(it->first, pos)) != string::npos)
+		{
+			tmp.replace(pos, it->first.length(), it->second);
+			pos += it->second.length();
+		}
 
-        ++it;
-    }
+		++it;
+	}
 
-    return tmp;
+	return tmp;
 }
 
 bool TC_Common::matchPeriod(const string& s, const string& pat)
@@ -634,6 +788,7 @@ bool TC_Common::matchPeriod(const string& s, const vector<string>& pat)
     return false;
 }
 
+#if TARGET_PLATFORM_LINUX || TARGET_PLATFORM_IOS
 void TC_Common::daemon()
 {
     pid_t pid;
@@ -677,6 +832,7 @@ void TC_Common::ignorePipe()
     sigemptyset(&sig.sa_mask);
     sigaction(SIGPIPE,&sig,NULL);
 }
+#endif
 
 bool TC_Common::isPrimeNumber(size_t n)
 {
@@ -735,6 +891,25 @@ size_t TC_Common::toSize(const string &s, size_t iDefaultSize)
     return iDefaultSize;
 }
 
+string TC_Common::getHostName()
+{
+	string hostName;
+	char buff[256] = { 0 };
+	int ret = ::gethostname(buff, sizeof(buff));
+	if (0 == ret)
+	{
+		hostName = string(buff);
+	}
+	else
+	{
+		// 获取不到host， 则直接传空串。
+	}
+	return hostName;
+}
+
+
+#if TARGET_PLATFORM_LINUX || TARGET_PLATFORM_IOS
+
 // Generate the randome string, a SHA1-sized random number
 void TC_Common::getRandomHexChars(char* p, unsigned int len)
 {
@@ -752,6 +927,9 @@ void TC_Common::getRandomHexChars(char* p, unsigned int len)
         p[j] = chars[p[j] & 0x0F];
 
 }
+
+
+#endif
 
 }
 
