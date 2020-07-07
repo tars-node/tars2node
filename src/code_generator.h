@@ -60,6 +60,10 @@
 #define PROTOCOL_COMPLEX PROTOCOL_V(IDL_NAMESPACE_STR, PROTOCOL_NAME, "COMPLEX")
 #define PROTOCOL_VAR TO_LOWER_STRING(PROTOCOL_NAME)
 
+#define PROTOCOL_VJ(space, protocol, type) \
+    space + "Stream." + protocol + "." + type + "_VERSION"
+#define PROTOCOL_JSON PROTOCOL_VJ(IDL_NAMESPACE_STR, PROTOCOL_NAME, "JSON")
+
 #define DISABLE_ESLINT "/* eslint-disable */"
 #define DISABLE_TSLINT "/* tslint:disable */"
 
@@ -85,17 +89,17 @@ public:
           _bDTS(false),
           _iOptimizeLevel(O0) {}
 
-    void createFile(const string& file, const bool bEntry = true);
+    void createFile(const string &file, const bool bEntry = true);
 
-    void setRpcPath(const string& sPath) { _sRpcPath = sPath; }
+    void setRpcPath(const string & sPath) { _sRpcPath = sPath; }
 
-    void setStreamPath(const string& sPath) { _sStreamPath = sPath; }
+    void setStreamPath(const string & sPath) { _sStreamPath = sPath; }
 
     void setEnableClient(bool bEnable) { _bClient = bEnable; }
 
     void setEnableServer(bool bEnable) { _bServer = bEnable; }
 
-    void setTargetPath(const string& sPath) { _sToPath = sPath + "/"; }
+    void setTargetPath(const string & sPath) { _sToPath = sPath + "/"; }
 
     void setRecursive(bool bEnable) { _bRecursive = bEnable; }
 
@@ -131,7 +135,7 @@ private:
         string      sName;
     };
 
-    struct ImportFile
+    struct ImportFile 
     {
         string                      sFile;
         string                      sModule;
@@ -152,6 +156,8 @@ private:
 
 private:
     string toFunctionName(const TypeIdPtr & pPtr, const string &sAction);
+
+    string toObjectString(const TypeIdPtr &pPtr);
 
     string getDataType(const TypePtr& pPtr, const bool &bCastEnumAsAny = false);
 
@@ -281,7 +287,7 @@ private:
 
     string getRealFileInfo(const string & sPath);
 
-    string printHeaderRemark(const string &sTypeName);
+    string printHeaderRemark(const string & sTypeName);
 
 private:
     string _sRpcPath;

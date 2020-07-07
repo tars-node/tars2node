@@ -5,9 +5,9 @@ project(tars2node)
 set(CMAKE_VERBOSE_MAKEFILE off)
 
 # version
-set(TARS_VERSION "1.2.0")
+set(TARS_VERSION "2.4.5")
 set(PARSER_VERSION "${TARS_VERSION}")
-set(GENERATOR_VERSION "20200315")
+set(GENERATOR_VERSION "20200707")
 
 # namespace
 set(IDL_NAMESPACE Tars)
