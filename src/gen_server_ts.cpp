@@ -198,17 +198,63 @@ string CodeGenerator::generateTSServerDispatch(const NamespacePtr &nPtr, const I
 
     for (size_t i = 0; i < vParamDecl.size(); i++)
     {
+        // if (vParamDecl[i]->isOut())
+        // {
+        //     dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
+        //          << " = _data_." << vParamDecl[i]->getTypeIdPtr()->getId() << " || " << getDefault(vParamDecl[i]->getTypeIdPtr(), "", nPtr->getId(), true)
+        //          << ";" << endl;
+        // }
+        // else
+        // {
+        //     dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
+        //          << " = _data_." << vParamDecl[i]->getTypeIdPtr()->getId()
+        //          << ";" << endl;
+        // }
+
+
         if (vParamDecl[i]->isOut())
         {
-            dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
+            StructPtr sPtr = StructPtr::dynamicCast(vParamDecl[i]->getTypeIdPtr()->getTypePtr());
+            if (sPtr)
+            {
+                dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
+                    << " = " << getDefault(vParamDecl[i]->getTypeIdPtr(), "", nPtr->getId(), true)
+                    << ";" << endl;
+                dstr << TAB << "_data_." << vParamDecl[i]->getTypeIdPtr()->getId() << " ? " << vParamDecl[i]->getTypeIdPtr()->getId() << ".readFromObject("
+                    << "_data_." << vParamDecl[i]->getTypeIdPtr()->getId() << ") : " << vParamDecl[i]->getTypeIdPtr()->getId()
+                    << ";" << endl;
+            }
+            else
+            {
+                dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
                  << " = _data_." << vParamDecl[i]->getTypeIdPtr()->getId() << " || " << getDefault(vParamDecl[i]->getTypeIdPtr(), "", nPtr->getId(), true)
                  << ";" << endl;
+            }
+            // dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
+            //      << " = _data_." << vParamDecl[i]->getTypeIdPtr()->getId() << " || " << getDefault(vParamDecl[i]->getTypeIdPtr(), "", nPtr->getId(), true)
+            //      << ";" << endl;
         }
         else
         {
-            dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
-                 << " = _data_." << vParamDecl[i]->getTypeIdPtr()->getId()
-                 << ";" << endl;
+            // dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
+            //      << " = _data_." << vParamDecl[i]->getTypeIdPtr()->getId()
+            //      << ";" << endl;
+            StructPtr sPtr = StructPtr::dynamicCast(vParamDecl[i]->getTypeIdPtr()->getTypePtr());
+            if (sPtr)
+            {
+                dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
+                    << " = " << getDefault(vParamDecl[i]->getTypeIdPtr(), "", nPtr->getId(), true)
+                    << ";" << endl;
+                dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId() << ".readFromObject("
+                    << "_data_." << vParamDecl[i]->getTypeIdPtr()->getId() << ")"
+                    << ";" << endl;
+            }
+            else
+            {
+                dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
+				<< " = _data_." << vParamDecl[i]->getTypeIdPtr()->getId() 
+				<< ";" << endl;
+            }
         }
     }
     DEL_TAB;

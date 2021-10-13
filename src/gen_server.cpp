@@ -241,7 +241,7 @@ string CodeGenerator::generateDispatch(const NamespacePtr &nPtr, const Interface
             StructPtr sPtr = StructPtr::dynamicCast(vParamDecl[i]->getTypeIdPtr()->getTypePtr());
             if (sPtr)
             {
-                dstr << TAB << "var " << vParamDecl[i]->getTypeIdPtr()->getId()
+                dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
                     << " = " << getDefault(vParamDecl[i]->getTypeIdPtr(), "", nPtr->getId(), true)
                     << ";" << endl;
                 dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId() << ".readFromObject("
@@ -250,7 +250,7 @@ string CodeGenerator::generateDispatch(const NamespacePtr &nPtr, const Interface
             }
             else
             {
-                dstr << TAB << "var " << vParamDecl[i]->getTypeIdPtr()->getId()
+                dstr << TAB << vParamDecl[i]->getTypeIdPtr()->getId()
 				<< " = _data_." << vParamDecl[i]->getTypeIdPtr()->getId() 
 				<< ";" << endl;
             }
